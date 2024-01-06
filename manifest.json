@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "리트코드 실행 핫키",
+  "description": "리트코드 Run버튼에 단축키를 달아줄게요",
+  "version": "1.0",
+  "action": {
+    "default_popup": "hello.html"
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": ["https://leetcode.com/problems/*", "https://school.programmers.co.kr/learn/courses/30/lessons/*"]
+    }
+  ],
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "background": { "service_worker": "background.js" }
+}

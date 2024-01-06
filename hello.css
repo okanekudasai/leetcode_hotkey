@@ -1,0 +1,42 @@
+:root {
+  --hot-key-box-size: 30px;
+}
+
+
+body {
+    width: 250px;
+}
+
+.text_center {
+    text-align: center;
+}
+
+.short_margin {
+    margin: 10px 0;
+}
+.very_short_margin {
+    margin: 2px 0 5px;
+}
+
+.hide {
+    display: none;
+}
+
+#current_hot_key {
+    padding: 0 4px;
+    height: var(--hot-key-box-size);
+    line-height: var(--hot-key-box-size);
+    font-size: 16px;
+}
+
+.blinking {
+    animation: blink_box 1s infinite;
+}
+
+@keyframes blink_box {
+    0% {
+        background-color: rgb(206, 206, 206);
+    } 100% {
+        background-color: white;
+    }
+}
