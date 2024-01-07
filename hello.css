@@ -22,7 +22,7 @@ body {
 }
 
 .hide {
-    display: none;
+    display: none !important;
 }
 
 #current_hot_key {
@@ -78,4 +78,14 @@ body {
 .flex_center {
     display: flex;
     justify-content: center;
+}
+
+.position_relative {
+    position: relative;
+}
+
+.vertical_center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }

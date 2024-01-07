@@ -12,6 +12,7 @@ if (link[1] != undefined) {
         }).then(res => res.json()).then(data => {
             chrome.storage.local.set({"token": token});
             chrome.storage.local.set({"username": JSON.stringify(data)});
+            chrome.storage.local.set({"solve_detect": true})
             //창닫기
             chrome.runtime.sendMessage({ action: 'closeCurrentTab' });
         })
