@@ -1,28 +1,3 @@
-let confirm_token = () => {
-    chrome.storage.local.get("token", function (result) {
-        let token = result["token"];
-        console.log(token != undefined)
-        if (token != undefined) {
-            let getUserName = () => {
-                const headers = new Headers();
-                headers.append('Authorization', `token ${token}`);
-                fetch('https://api.github.com/user', {
-                    method: 'GET',
-                    headers: headers,
-                }).then(res => res.json()).then(data => {
-                    if (data["message"] == "Bad credentials") {
-                        console.log("토큰 만료");
-                    } else {
-                        console.log("토큰 유효");
-                    }
-                })
-            }
-            getUserName();
-        }
-    });
-}
-confirm_token();
-
 document.addEventListener('DOMContentLoaded', () => {
     var current_hot_key = document.getElementById('current_hot_key');
     var change_button = document.getElementById('change_button');
@@ -32,8 +7,46 @@ document.addEventListener('DOMContentLoaded', () => {
     var login_button = document.getElementById('login_button');
     var state_complete = document.getElementById('state_complete');
     var state_change = document.getElementById('state_change');
+    var login_button_box = document.getElementById('login_button_box');
+    var spinner_box = document.getElementById('spinner_box');
+    var logout_button_box = document.getElementById('logout_button_box');
     var change_state = false;
     var hot_key_to_set = [];
+
+    let confirm_token = () => {
+        chrome.storage.local.get("token", function (result) {
+            let token = result["token"];
+            if (token != undefined) {
+                // login_button_box.classList.add("hide");
+                // spinner_box.classList.remove("hide");
+                let getUserName = () => {
+                    const headers = new Headers();
+                    headers.append('Authorization', `token ${token}`);
+                    fetch('https://api.github.com/user', {
+                        method: 'GET',
+                        headers: headers,
+                    }).then(res => res.json()).then(data => {
+                        if (data["message"] == "Bad credentials") {
+                            console.log("토큰 만료");
+                            // chrome.storage.local.set({"username": ""});
+                            // login_button_box.classList.remove("hide");
+                        } else {
+                            console.log("토큰 유효");
+                            chrome.storage.local.get("username", function (result) {
+                                let username = JSON.parse(result["username"])
+                                console.log(username);
+                            })
+                            logout_button_box.classList.remove("hide");
+                        }
+                        // spinner_box.classList.add("hide");
+                    })
+                }
+                getUserName();
+            }
+        });
+    }
+    confirm_token();
+
     var init = () => {
         chrome.storage.local.get("hot_key", function (result) {
             current_hot_key.innerText = result["hot_key"];
@@ -70,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     login_button.addEventListener('click', () => {
         oAuth2.begin();
+        login_button_box.classList.toggle('hide');
+        spinner_box.classList.toggle('hide');
     })
     toggle_button_show_hide = () => {
         change_button.classList.toggle('hide');

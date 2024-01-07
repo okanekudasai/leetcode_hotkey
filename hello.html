@@ -27,8 +27,17 @@
             <button id="retry_button" class="hide">지우기</button>
             <button id="cancel_button" class="hide">취소</button>
         </div>
-        <div class="short_margin" style="display: flex; justify-content: center;">
-            <img src="./asset/github.png" width="30" height="30" style="display: block; margin-right: 10px;"><button id="login_button">깃허브 로그인</button>
+        <div id="login_button_box" class="short_margin login_bar">
+            <div style="display: flex; justify-content: center;">
+                <img src="./asset/github.png" width="30" height="30" style="display: block; margin-right: 10px;"><button id="login_button">깃허브 로그인</button>
+            </div>
+        </div>
+        <div id="spinner_box" class="hide short_margin login_bar">
+            <span class="loader"></span>
+        </div>
+        <div id="logout_button_box" class="hide short_margin login_bar">
+            <!-- <div>(자동푸쉬, 알림)체크박스, 로그아웃, 오늘 푼 문제</div> -->
+            <!-- 로그인이 되면 (저장소 만들기, 저장소 방문 - 문제해결 감지 끄기/켜기 체크박스), 로그아웃 -->
         </div>
     </div>
 </body>

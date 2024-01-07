@@ -1,10 +1,12 @@
 :root {
-  --hot-key-box-size: 30px;
+    --hot-key-box-size: 30px;
+    --login-bar-height: 30px;
 }
 
 
 body {
     width: 250px;
+    transition: height, 0.5s
 }
 
 .text_center {
@@ -14,6 +16,7 @@ body {
 .short_margin {
     margin: 10px 0;
 }
+
 .very_short_margin {
     margin: 2px 0 5px;
 }
@@ -36,7 +39,43 @@ body {
 @keyframes blink_box {
     0% {
         background-color: rgb(206, 206, 206);
-    } 100% {
+    }
+
+    100% {
         background-color: white;
     }
+}
+
+.loader {
+    width: 30px;
+    height: 30px;
+    border: 5px solid #212121;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.login_bar {
+    height: var(--login-bar-height);
+}
+
+.logout_bar {
+    height: calc(var(--login-bar-height) * 2);
+}
+
+.flex_center {
+    display: flex;
+    justify-content: center;
 }
