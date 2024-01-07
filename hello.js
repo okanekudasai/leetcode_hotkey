@@ -1,9 +1,35 @@
+let confirm_token = () => {
+    chrome.storage.local.get("token", function (result) {
+        let token = result["token"];
+        console.log(token != undefined)
+        if (token != undefined) {
+            let getUserName = () => {
+                const headers = new Headers();
+                headers.append('Authorization', `token ${token}`);
+                fetch('https://api.github.com/user', {
+                    method: 'GET',
+                    headers: headers,
+                }).then(res => res.json()).then(data => {
+                    if (data["message"] == "Bad credentials") {
+                        console.log("토큰 만료");
+                    } else {
+                        console.log("토큰 유효");
+                    }
+                })
+            }
+            getUserName();
+        }
+    });
+}
+confirm_token();
+
 document.addEventListener('DOMContentLoaded', () => {
     var current_hot_key = document.getElementById('current_hot_key');
     var change_button = document.getElementById('change_button');
     var check_button = document.getElementById('check_button');
     var retry_button = document.getElementById('retry_button');
     var cancel_button = document.getElementById('cancel_button');
+    var login_button = document.getElementById('login_button');
     var state_complete = document.getElementById('state_complete');
     var state_change = document.getElementById('state_change');
     var change_state = false;
@@ -29,10 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setObj['hot_key'] = hot_key_to_set.join("+");
         chrome.storage.local.set(setObj);
         change_state = false;
-        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-            // 현재 활성화된 탭에 메시지 전송
-            chrome.tabs.sendMessage(tabs[0].id, { action: 'callContentScriptFunction' });
-        });
+        // chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        //     // 현재 활성화된 탭에 메시지 전송
+        //     chrome.tabs.sendMessage(tabs[0].id, { action: 'callContentScriptFunction' });
+        // });
     });
     retry_button.addEventListener('click', () => {
         clear_hot_key_to_set();
@@ -41,6 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
         toggle_button_show_hide();
         init();
         change_state = false;
+    })
+    login_button.addEventListener('click', () => {
+        oAuth2.begin();
     })
     toggle_button_show_hide = () => {
         change_button.classList.toggle('hide');

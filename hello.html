@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="./hello.js"></script>
+    <script src="./util/oAuth.js"></script>
     <link rel="stylesheet" href="hello.css" />
 </head>
 
@@ -21,10 +22,13 @@
             <span id="current_hot_key"></span>
         </div>
         <div>
-            <button id="change_button">바꾸기</button>
+            <button id="change_button">단축키 바꾸기</button>
             <button id="check_button" class="hide">확인</button>
             <button id="retry_button" class="hide">지우기</button>
             <button id="cancel_button" class="hide">취소</button>
+        </div>
+        <div class="short_margin" style="display: flex; justify-content: center;">
+            <img src="./asset/github.png" width="30" height="30" style="display: block; margin-right: 10px;"><button id="login_button">깃허브 로그인</button>
         </div>
     </div>
 </body>
