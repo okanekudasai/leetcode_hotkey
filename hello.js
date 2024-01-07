@@ -145,6 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         })
     })
+    visit_rep_button.addEventListener('click', () => {
+        chrome.storage.local.get("username", function (result) {
+            let username = JSON.parse(result["username"]);
+            const linkUrl = username["html_url"] + "/algorithm_auto_push_extension";
+            window.open(linkUrl, '_blank');
+        })
+    })
     solve_detect_check.addEventListener('change', function () {
         if (solve_detect_check.checked) {
             console.log('체크박스가 체크되었습니다.');
