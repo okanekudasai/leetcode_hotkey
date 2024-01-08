@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         code = request.data;
 
         // aws를 통해 accesstoken을 받아와요
-        let token = await fetch("http://localhost:9999/api/codeToToken/" + code).then(res => res.text());
+        let token = await fetch("http://52.55.103.159:9999/api/codeToToken/" + code).then(res => res.text());
 
         // accesstoken을 받아오는데 실패했다면 창을 닫고 모든 프로세스를 종료해요
         if (token == 'error') {

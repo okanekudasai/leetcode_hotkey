@@ -29,6 +29,7 @@ body {
     height: var(--hot-key-box-size);
     line-height: var(--hot-key-box-size);
     font-size: 16px;
+    word-wrap: break-word;
 }
 
 .blinking {
@@ -243,4 +244,10 @@ input:focus+.switch-left+.switch-right {
 
 input:checked:focus+.switch-left+.switch-right {
     color: #333;
+}
+
+.bright_div {
+    border-radius: 10px;
+    background-color: #f4f4f4;
+    padding: 10px;
 }

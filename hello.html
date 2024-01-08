@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="hello.css" />
 </head>
 
-<body>
-    <div class="text_center short_margin">
+<body style="background-color: #eeeeee;">
+    <div class="bright_div text_center short_margin">
         <div style="margin-bottom: 4px;">이 확장프로그램이 설치되있으면</div>
         <div>1.성공 코드가 내 저장소에 자동 푸쉬되요</div>
         <div>2.Run버튼을 단축키로 실행 할 수 있어요</div>
     </div>
-    <div class="text_center">
-        <div id="state_complete">현재 단축키</div>
+    <div class="bright_div text_center">
+        <div id="state_complete">현재 실행 단축키</div>
         <div id="state_change" class="hide">변경중...(키를 하나씩 눌러주세요)</div>
         <div class="very_short_margin">
             <span id="current_hot_key"></span>
@@ -27,6 +27,8 @@
             <button id="retry_button" class="hide">지우기</button>
             <button id="cancel_button" class="hide">취소</button>
         </div>
+    </div>
+    <div class="bright_div text_center short_margin">
         <div id="login_button_box" class="short_margin login_bar">
             <div class="flex_center">
                 <img id="github_image" src="./asset/github.png" width="30" height="30" style="display: block; margin-right: 10px;"><button id="login_button">깃허브 로그인</button>
