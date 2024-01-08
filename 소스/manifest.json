@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "리트코드 실행 핫키",
+  "description": "리트코드를 자동 푸쉬해요. Run버튼에 단축키를 달아줄게요",
+  "version": "2.0",
+  "action": {
+    "default_popup": "hello.html"
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/github_content.js"],
+      "matches": ["https://github.com/*"]
+    },
+    {
+      "js": ["scripts/util.js", "scripts/github_util.js"],
+      "css": ["css/git_process_css.css"],
+      "matches": ["https://leetcode.com/problems/*", "https://school.programmers.co.kr/learn/courses/30/lessons/*", "https://www.acmicpc.net/problem/*"]
+    },
+    {
+      "js": ["scripts/leetcode_content.js"],
+      "matches": ["https://leetcode.com/problems/*"]
+    },
+    {
+      "js": ["scripts/programmers_content.js"],
+      "matches": ["https://school.programmers.co.kr/learn/courses/30/lessons/*"]
+    },
+    {
+      "js": ["scripts/boj_content.js"],
+      "matches": ["https://www.acmicpc.net/problem/*"]
+    }
+  ],
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "host_permissions": [
+    "https://school.programmers.co.kr/",
+    "https://github.com/",
+    "https://leetcode.com/"
+  ],
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "background": { "service_worker": "background.js" }
+}
