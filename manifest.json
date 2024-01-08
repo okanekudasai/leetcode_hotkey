@@ -8,12 +8,24 @@
   },
   "content_scripts": [
     {
-      "js": ["scripts/content.js"],
-      "matches": ["https://leetcode.com/problems/*", "https://school.programmers.co.kr/learn/courses/30/lessons/*"]
-    },
-    {
       "js": ["scripts/github_content.js"],
       "matches": ["https://github.com/*"]
+    },
+    {
+      "js": ["scripts/util.js", "scripts/github_util.js"],
+      "matches": ["https://leetcode.com/problems/*", "https://school.programmers.co.kr/learn/courses/30/lessons/*", "https://www.acmicpc.net/problem/*"]
+    },
+    {
+      "js": ["scripts/leetcode_content.js"],
+      "matches": ["https://leetcode.com/problems/*"]
+    },
+    {
+      "js": ["scripts/programmers_content.js"],
+      "matches": ["https://school.programmers.co.kr/learn/courses/30/lessons/*"]
+    },
+    {
+      "js": ["scripts/boj_content.js"],
+      "matches": ["https://www.acmicpc.net/problem/*"]
     }
   ],
   "icons": {

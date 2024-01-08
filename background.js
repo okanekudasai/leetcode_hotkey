@@ -2,6 +2,7 @@ chrome.runtime.onInstalled.addListener(() => {
     let setObj = {};
     setObj['hot_key'] = 'ControlLeft+Space';
     chrome.storage.local.set(setObj);
+    chrome.storage.local.set({basic_directory: "algorithm_auto_push_extension"});
 });
 
 //ControlLeft, ShiftLeft, AltLeft, Space

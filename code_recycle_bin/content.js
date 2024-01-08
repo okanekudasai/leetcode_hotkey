@@ -1,9 +1,39 @@
 let submit_list
 let find_try = 0;
+let confirm_token = () => {
+    chrome.storage.local.get("token", function (result) {
+        let token = result["token"];
+        if (token != undefined) {
+            let getUserName = () => {
+                const headers = new Headers();
+                headers.append('Authorization', `token ${token}`);
+                fetch('https://api.github.com/user', {
+                    method: 'GET',
+                    headers: headers,
+                }).then(res => res.json()).then(data => {
+                    if (data["message"] == "Bad credentials") {
+                        chrome.storage.local.set({ "username": "" });
+                    } else {
+                        // 로그인 이 되어 있다면
+                        let username = data;
+                        apiUrl = `https://api.github.com/repos/${username.login}/algorithm_auto_push_extension/contents/`;
+                        fetch(apiUrl).then(res => res.json()).then(data => {
+                            console.log(data)
+                        }).catch (e => {
+                            console.log("디렉터리 조회 실패")
+                        })
+                    }
+                })
+            }
+            getUserName();
+        }
+    });
+}
 let find_submit_list = setInterval(() => {
     submit_list = document.querySelector("#qd-content").firstChild.firstChild.firstChild.firstChild.firstChild.nextElementSibling.firstChild.firstChild.nextElementSibling;
     find_try++;
     if (submit_list != null) {
+        console.log("찾음")
         clearInterval(find_submit_list);
         
         // 제출 리스트를 찾으면 아래 코드실행
@@ -14,7 +44,12 @@ let find_submit_list = setInterval(() => {
             mutations.forEach(function (mutation) {
                 // mutation.type이 'childList'이면 자식 노드가 변경된 것
                 if (mutation.type === 'childList') {
-                    after_find_new_submit(mutation);
+                    chrome.storage.local.get("solve_detect", (result) => {
+                        if (result["solve_detect"]) {
+                            //만약 해결 감지가 켜져 있다면
+                            after_find_new_submit(mutation);
+                        }
+                    })
                 }
             });
         });
@@ -31,6 +66,8 @@ let find_submit_list = setInterval(() => {
             console.log(result);
             if (result == "Accepted") {
                 alert("통과");
+                console.log("통과");
+                confirm_token();
             }
         }
     }

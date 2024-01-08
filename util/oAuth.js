@@ -10,6 +10,6 @@ const oAuth2 = {
 
         let url = `${this.AUTHORIZATION_URL}?client_id=${this.CLIENT_ID}&redirect_uri=${this.REDIRECT_URL}&scope=repo`;
 
-        chrome.tabs.create({ url, selected: true })
+        window.open(url, '_blank');
     },
 }
