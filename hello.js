@@ -55,6 +55,7 @@ let init = async () => {
         let login_button = document.getElementById('login_button');
         let state_complete = document.getElementById('state_complete');
         let state_change = document.getElementById('state_change');
+        let github_image = document.getElementById('github_image');
         let login_button_box = document.getElementById('login_button_box');
         let spinner_box = document.getElementById('spinner_box');
         let make_rep_box = document.getElementById('make_rep_box');
@@ -184,6 +185,11 @@ let init = async () => {
             toggle_button_show_hide();
             init();
             change_state = false;
+        })
+
+        // 깃허브 아이콘을 누르면 동작하는 이벤트에요
+        github_image.addEventListener('click', () => {
+            window.open('https://github.com/', '_blank');
         })
 
         // 로그인 버튼이에요
