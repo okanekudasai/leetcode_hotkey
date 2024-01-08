@@ -1,32 +1,13 @@
-var link = window.location.href.split("?code=");
-if (link[1] != undefined) {
-    chrome.storage.local.set({ "code": link[1] });
+
+init = () => {
+    let link = window.location.href.split("?code=");
     let code = link[1];
-    let token;
-    getUserName = () => {
-        const headers = new Headers();
-        headers.append('Authorization', `token ${token}`);
-        fetch('https://api.github.com/user', {
-            method: 'GET',
-            headers: headers,
-        }).then(res => res.json()).then(data => {
-            chrome.storage.local.set({"token": token});
-            chrome.storage.local.set({"username": JSON.stringify(data)});
-            chrome.storage.local.set({"solve_detect": true})
-            //창닫기
-            chrome.runtime.sendMessage({ action: 'closeCurrentTab' });
-        })
+    
+    if (code == undefined) {
+        return;
     }
-    getToken = () => {
-        fetch("http://localhost:8080/codeToToken/" + code).then(res => res.text()).then(data => {
-            if (data != "error") {
-                token = data
-                getUserName();
-            } else {
-                alert("로그인 실패");
-                chrome.runtime.sendMessage({ action: 'closeCurrentTab' });
-            }
-        })
-    }
-    getToken();
+
+    chrome.runtime.sendMessage({ action: 'closeCurrentTab', data: code });
 }
+
+init();

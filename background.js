@@ -7,7 +7,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 //ControlLeft, ShiftLeft, AltLeft, Space
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.action === 'closeCurrentTab') {
         // 현재 탭 닫기
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -16,5 +16,27 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 chrome.tabs.remove(currentTab.id);
             }
         });
+        
+        code = request.data;
+
+        // aws를 통해 accesstoken을 받아와요
+        let token = await fetch("http://localhost:8080/codeToToken/" + code).then(res => res.text());
+
+        // accesstoken을 받아오는데 실패했다면 창을 닫고 모든 프로세스를 종료해요
+        if (token == 'error') {
+            return;
+        }
+
+        const headers = new Headers();
+        headers.append('Authorization', `token ${token}`);
+        fetch('https://api.github.com/user', {
+            method: 'GET',
+            headers: headers,
+        }).then(res => res.json()).then(data => {
+            chrome.storage.local.set({ "token": token });
+            chrome.storage.local.set({ "username": JSON.stringify(data) });
+            chrome.storage.local.set({ "solve_detect": true })
+        })
     }
 });
+

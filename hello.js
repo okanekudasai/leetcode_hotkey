@@ -8,6 +8,41 @@ let init = async () => {
         current_hot_key.innerText = result["hot_key"];
     });
 
+    /**
+     * 로그인이 정말 되어있는지 토큰의 유효성을 검사해 줘요
+     * @param {String} token 
+     * @returns {object} 유저의 여러정보를 담고 있어요
+     * @returns 0 - 토큰이 유효하지 않다는 뜻이에요
+     */
+    let is_token_valid = async (token) => {
+
+        // 유저네임에 github로부터 로그인 정보를 가져와요
+        let username = await new Promise((resolve, reject) => {
+            const headers = new Headers();
+            headers.append('Authorization', `token ${token}`);
+            fetch('https://api.github.com/user', {
+                method: 'GET',
+                headers: headers,
+            }).then(res => {
+                resolve(res.json());
+            })
+        });
+
+        // message에는 토큰이 유효하지 않은 등의 로그인 되지 않은 이유가 담겨있어요
+        // 즉 message에 뭔가 있다는 건 로그인 되지 않았음을 의미해요
+        // message에 아무것도 없다면 username을 그대로 반환해요
+        if (username.message == undefined) return username;
+
+        // message에 뭔가 있다면 로그인을 해제해 줘요
+        else {
+            chrome.storage.local.remove("token");
+            token = undefined
+            chrome.storage.local.remove("username");
+            username = undefined
+            return 0;
+        }
+    }
+
     // 아래부터는 팝업창에 모든 요소가 로드 되었을 떄 실행할게요
     document.addEventListener('DOMContentLoaded', async () => {
 
@@ -30,21 +65,22 @@ let init = async () => {
         let solve_detect_check = document.getElementById('solve_detect_check');
         let logout_button_box = document.getElementById('logout_button_box');
         let logout_button = document.getElementById('logout_button');
-        
+
         /** 현재 단축키를 변경 중인지 알려줘요 */
         let change_state = false;
         let hot_key_to_set = [];
 
         // 레포지토리의 이름가져와요
-        let basic_directory = await new Promise((res) => {
-            chrome.storage.local.get("basic_directory", result => result["basic_directory"]);
+        let basic_directory = await new Promise((resolve, reject) => {
+            chrome.storage.local.get("basic_directory", result => resolve(result["basic_directory"]));
         })
 
         // 토큰을 가져와요
-        let token = await new Promise((res) => {
-            chrome.storage.local.get("token", result => result["token"]);
+        let token = await new Promise((resolve, reject) => {
+            chrome.storage.local.get("token", result => resolve(result["token"]));
         })
 
+        console.log(token);
         // 토큰이 있다면
         if (token != undefined) {
 
@@ -54,13 +90,16 @@ let init = async () => {
         }
 
         // 토큰의 유효성을 검사해요
-        let username = await Promise((resolve, reject) => {
-            resolve(is_token_valid());
+        let username = await new Promise((resolve, reject) => {
+            resolve(is_token_valid(token));
         })
 
         // 토큰이 유효하지 않다면
         if (username == 0) {
 
+            // 변수를 초기화 해줘요
+            token = undefined;
+            username = undefined;
             // 스피너 버튼을 숨기고, 로그인 버튼을 다시 보여줘요
             spinner_box.classList.add("hide");
             login_button_box.classList.remove("hide");
@@ -68,6 +107,7 @@ let init = async () => {
 
         // 토큰이 유효하다면
         else {
+
             // repos_url에 있는 레포지터리 리스트를 받아와요
             let repo_list = await fetch(username["repos_url"], {
                 method: 'GET',
@@ -75,10 +115,9 @@ let init = async () => {
 
             // repo_list를 돌며 basic_directory와 이름이 같은 리포지터리가 있는지 확인해요
             flag = false // 일단 레포지토리를 찾지 못한상태
-            for (let i of data) {
+            for (let i of repo_list) {
                 if (i["name"] == basic_directory) {
                     flag = true; // 이미 해당리포지토리가 있으면 레포지토리 만들기 버튼을 숨겨요
-                    console.log(i["name"]);
                     break;
                 }
             }
@@ -87,7 +126,9 @@ let init = async () => {
             if (flag) {
 
                 // 해결 감지가 켜져 있는지 확인해서 반영해요
-                solve_detect_check.checked = await chrome.storage.local.get("solve_detect", result => result["solve_detect"]);
+                solve_detect_check.checked = await new Promise((resolve, reject) =>
+                    chrome.storage.local.get("solve_detect", result => resolve(result["solve_detect"])
+                ))
 
                 // 스피너, 레포지토리 만들기 버튼을 숨기고
                 spinner_box.classList.add("hide");
@@ -123,6 +164,7 @@ let init = async () => {
             clear_hot_key_to_set();
             change_state = true;
         });
+
 
         // 바꾼 단축키로 확인할 때 부르는 버튼이에요
         check_button.addEventListener('click', () => {
@@ -188,21 +230,26 @@ let init = async () => {
         // 해결 감지 버튼이 눌렸을때 작동해요
         solve_detect_check.addEventListener('change', function () {
             if (solve_detect_check.checked) {
-                console.log('체크박스가 체크되었습니다.');
                 chrome.storage.local.set({ "solve_detect": true })
             } else {
-                console.log('체크박스가 체크 해제되었습니다.');
                 chrome.storage.local.set({ "solve_detect": false })
             }
         });
 
         // 로그아웃 버튼이에요
-        logout_button.addEventListener('click', () => {
-            chrome.storage.local.set({ "token": undefined });
-            chrome.storage.local.set({ "username": undefined });
+        logout_button.addEventListener('click', async () => {
+            chrome.storage.local.remove("token");
+            token = undefined
+            chrome.storage.local.remove("username");
+            username = undefined
             chrome.storage.local.set({ "solve_detect": false })
             logout_button_box.classList.add("hide");
             login_button_box.classList.remove("hide");
+
+            token = await new Promise((resolve, reject) => {
+                chrome.storage.local.get("token", result => resolve(result["token"]));
+            })
+            console.log("!!!" + token);
         })
 
         // 토글 해줘요
