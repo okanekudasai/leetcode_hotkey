@@ -80,7 +80,6 @@ let init = async () => {
             chrome.storage.local.get("token", result => resolve(result["token"]));
         })
 
-        console.log(token);
         // 토큰이 있다면
         if (token != undefined) {
 
@@ -198,11 +197,6 @@ let init = async () => {
         make_rep_button.addEventListener('click', async () => {
             const apiUrl = 'https://api.github.com/user/repos';
 
-            const repoData = {
-                name: basic_directory,
-            };
-
-
             let data = await fetch('https://api.github.com/user/repos', {
                 method: 'POST',
                 headers: {
@@ -211,14 +205,24 @@ let init = async () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    name: repoName,
+                    name: basic_directory,
                     auto_init: true,
                     private: false,
                     gitignore_template: 'Node',
                 }),
-            })
+            }).then(res => res.json());
 
-            // 레포지터리 생성 되는지 않되는 지 모르겠음
+            if (data.id != undefined) {
+                // 해결 감지가 켜져 있는지 확인해서 반영해요
+                solve_detect_check.checked = true;
+
+                // 레포지토리 만들기 버튼을 숨기고
+                make_rep_box.classList.add("hide");
+
+                // 레포지토리 방문과 감지 체크박스 표시
+                visit_rep_box.classList.add("hide");
+                check_box_container.classList.add("hide");
+            }
         })
 
         // 레포지터리 방문 버튼이에요
@@ -249,7 +253,6 @@ let init = async () => {
             token = await new Promise((resolve, reject) => {
                 chrome.storage.local.get("token", result => resolve(result["token"]));
             })
-            console.log("!!!" + token);
         })
 
         // 토글 해줘요

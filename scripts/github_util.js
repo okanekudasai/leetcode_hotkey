@@ -64,6 +64,7 @@ class GitHub {
             'C#': ['.cs', '//'],
             'Java': ['.java', '//'],
             'Python': ['.py', '#'],
+            'Python3': ['.py', '#'],
             'JavaScript': ['.js', '//']
         }
 

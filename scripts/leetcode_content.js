@@ -113,6 +113,9 @@ document.addEventListener('click', async (event) => {
     //반복을 시작해요
     let find_submit_list = setInterval(() => {
 
+        // cycle을 줄여줘요
+        if(cycle-- == 0) clearInterval(find_submit_list);
+
         // 체점 이 끝나면 아래 요소가 자동으로 생성되요
         let console_div = document.querySelector('[data-e2e-locator="console-console-button"]');
 
@@ -132,7 +135,6 @@ document.addEventListener('click', async (event) => {
 
             // 위 함수에서 파싱하지 못했던 코드도 파싱할게요
             data["code"] = code;
-            console.log(data.code);
 
             // 만약 찾은 데이터가 없다면 작업을 중단해요
             if (data == 0) return;
