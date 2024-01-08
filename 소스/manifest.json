@@ -2,12 +2,13 @@
   "manifest_version": 3,
   "name": "리트코드 실행 핫키",
   "description": "리트코드를 자동 푸쉬해요. Run버튼에 단축키를 달아줄게요",
-  "version": "2.0",
+  "version": "2.1",
   "action": {
     "default_popup": "hello.html"
   },
   "content_scripts": [
     {
+      "include_globs": ["*code=*"],
       "js": ["scripts/github_content.js"],
       "matches": ["https://github.com/*"]
     },

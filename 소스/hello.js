@@ -3,13 +3,6 @@
 /** 팝업창이 열리자 마자 이 함수가 실행되요 */
 let init = async () => {
 
-    /** 저장된 핫키를 불러와서 표시하는 함수에요 */
-    let display_hotkey = () => {
-        chrome.storage.local.get("hot_key", function (result) {
-            current_hot_key.innerText = result["hot_key"];
-        });
-    }
-    display_hotkey();
 
     /**
      * 로그인이 정말 되어있는지 토큰의 유효성을 검사해 줘요
@@ -71,7 +64,16 @@ let init = async () => {
         let logout_button = document.getElementById('logout_button');
         let repo_make_pending = document.getElementById('repo_make_pending');
 
-        /** BCC가 되는지 확인 하기 위한 실험 변수에요 */
+        
+        /** 저장된 핫키를 불러와서 표시하는 함수에요 */
+        let display_hotkey = () => {
+            chrome.storage.local.get("hot_key", function (result) {
+                current_hot_key.innerText = result["hot_key"];
+            });
+        }
+        display_hotkey();
+
+        /** background.js에서 call을 받기 위한 객체에요 */
         const channel = new BroadcastChannel('repo_notice');
         channel.onmessage = event => {
             repo_make_pending.classList.add("hide");
