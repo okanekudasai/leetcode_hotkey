@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "리트코드 실행 핫키",
   "description": "리트코드 Run버튼에 단축키를 달아줄게요",
-  "version": "1.0",
+  "version": "2.0",
   "action": {
     "default_popup": "hello.html"
   },
