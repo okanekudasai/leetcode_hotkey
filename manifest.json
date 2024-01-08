@@ -13,6 +13,7 @@
     },
     {
       "js": ["scripts/util.js", "scripts/github_util.js"],
+      "css": ["css/git_process_css.css"],
       "matches": ["https://leetcode.com/problems/*", "https://school.programmers.co.kr/learn/courses/30/lessons/*", "https://www.acmicpc.net/problem/*"]
     },
     {

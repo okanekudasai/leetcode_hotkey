@@ -218,16 +218,19 @@ let init = async () => {
                 }),
             }).then(res => res.json());
 
+            console.log(data)
             if (data.id != undefined) {
-                // 해결 감지가 켜져 있는지 확인해서 반영해요
+                console.log("!!");
+                // 해결 감지가 켜져요
                 solve_detect_check.checked = true;
 
                 // 레포지토리 만들기 버튼을 숨기고
                 make_rep_box.classList.add("hide");
 
                 // 레포지토리 방문과 감지 체크박스 표시
-                visit_rep_box.classList.add("hide");
-                check_box_container.classList.add("hide");
+                visit_rep_box.classList.remove("hide");
+                check_box_container.classList.remove("hide");
+                console.log("@@");
             }
         })
 

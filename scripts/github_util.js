@@ -276,22 +276,82 @@ ${this.data.code}`
             })
         })
 
+        // 깃 푸쉬 진행 과정을 보여주기 위한 새로운 요소를 문서에 추가해줘요
+        let git_process_bar_position_box = document.createElement('div');
+        let git_process_bar_content_box = document.createElement('div');
+        let git_process_bar_flex_box = document.createElement('div');
+        let dont_close_instruction = document.createElement('div');
+        let instruction_box = document.createElement('div');
+        let process_bar_background = document.createElement('div');
+        let process_bar_foreground = document.createElement('div');
+
+        git_process_bar_position_box.classList.add("git_process_bar_position_box");
+        git_process_bar_position_box.classList.add("hide");
+        git_process_bar_content_box.classList.add("git_process_bar_content_box");
+        git_process_bar_content_box.classList.add("flex_center");
+        git_process_bar_flex_box.classList.add("git_process_bar_flex_box");
+        dont_close_instruction.classList.add("dont_close_instruction");
+        instruction_box.classList.add("instruction_box");
+        process_bar_background.classList.add("process_bar_background");
+        process_bar_foreground.classList.add("process_bar_foreground");
+
+        document.body.appendChild(git_process_bar_position_box);
+        git_process_bar_position_box.appendChild(git_process_bar_content_box);
+        git_process_bar_content_box.appendChild(git_process_bar_flex_box);
+        git_process_bar_flex_box.appendChild(dont_close_instruction);
+        git_process_bar_flex_box.appendChild(instruction_box);
+        git_process_bar_flex_box.appendChild(process_bar_background);
+        process_bar_background.appendChild(process_bar_foreground);
+
+        process_bar_foreground.style.width = "0"
+
+        dont_close_instruction.innerText = "탭을 닫으면 푸쉬가 중지되요"
+        git_process_bar_position_box.classList.remove("hide");
+
+        await new Promise((resolve, reject) => {
+            setTimeout(() =>{
+                resolve(git_process_bar_position_box.classList.add("show_git_process"));
+            }, 5);
+        })
+
+        instruction_box.innerText = "기본브랜치를 찾고 있어요";
         // 기본브랜치를 찾아요
         let default_branch = await this.find_default_branch(this.username.login, repo);
+        process_bar_foreground.style.width = "10%"
 
+        instruction_box.innerText = "이전 커밋의 해쉬값을 찾고 있어요";
         // 기본 브랜치의 마지막 커밋의 해쉬값을 찾아요
         let last_commit_sha = await this.find_last_commit_sha(this.username.login, default_branch, repo);
+        process_bar_foreground.style.width = "25%"
 
+        instruction_box.innerText = "베이스 트리의 해쉬값을 찾고 있어요";
         // 찾은 해쉬값을 이용해 베이스 트리의 해쉬값을 찾아요
         let base_tree_sha = await this.find_base_tree_sha(this.username.login, repo, last_commit_sha);
-
+        process_bar_foreground.style.width = "45%"
+        
+        instruction_box.innerText = "커밋할 파일을 만들고 있어요";
         // 베이스 트리에 커밋하고자 하는 파일을 적어요
         let new_tree_sha = await this.make_new_tree_sha(this.username.login, repo, base_tree_sha);
-
+        process_bar_foreground.style.width = "60%"
+        
+        instruction_box.innerText = "새로운 커밋의 해쉬값을 얻고 있어요";
         // 정말 커밋이 이루어져요. 새로운 커밋의 해쉬값을 얻어요
         let new_commit_sha = await this.make_new_commit_sha(this.username.login, repo, last_commit_sha, new_tree_sha);
-
+        process_bar_foreground.style.width = "90%"
+        
+        instruction_box.innerText = "푸쉬중이에요";
         // 푸쉬가 이루어 져요
         let push_result = await this.make_git_push(this.username.login, repo, new_commit_sha, default_branch)
+        process_bar_foreground.style.width = "100%"
+        
+        instruction_box.innerText = "푸쉬가 완료되었어요!";
+
+        setTimeout(() => {
+            let h = -git_process_bar_position_box.offsetHeight -8;
+            git_process_bar_position_box.classList.remove("show_git_process");
+            setTimeout(() => {
+                git_process_bar_position_box.classList.add("hide");
+            }, 500)
+        }, 2000)
     }
 }

@@ -125,13 +125,13 @@ button:hover {
     height: 4em;
     overflow: hidden;
     border-bottom: 0.5em solid #eee;
-  }
-  
-  .rocker-small {
+}
+
+.rocker-small {
     font-size: 0.75em;
-  }
-  
-  .rocker::before {
+}
+
+.rocker::before {
     content: "";
     position: absolute;
     top: 0.5em;
@@ -141,16 +141,16 @@ button:hover {
     background-color: #999;
     border: 0.5em solid #eee;
     border-bottom: 0;
-  }
-  
-  .rocker input {
+}
+
+.rocker input {
     opacity: 0;
     width: 0;
     height: 0;
-  }
-  
-  .switch-left,
-  .switch-right {
+}
+
+.switch-left,
+.switch-right {
     cursor: pointer;
     position: absolute;
     display: flex;
@@ -160,26 +160,26 @@ button:hover {
     width: 3em;
     transition: 0.2s;
     user-select: none;
-  }
-  
-  .switch-left {
+}
+
+.switch-left {
     height: 2.4em;
     width: 2.75em;
     left: 0.85em;
     bottom: 0.4em;
     background-color: #ddd;
     transform: rotate(15deg) skewX(15deg);
-  }
-  
-  .switch-right {
+}
+
+.switch-right {
     right: 0.5em;
     bottom: 0;
     background-color: #bd5757;
     color: #fff;
-  }
-  
-  .switch-left::before,
-  .switch-right::before {
+}
+
+.switch-left::before,
+.switch-right::before {
     content: "";
     position: absolute;
     width: 0.4em;
@@ -187,19 +187,19 @@ button:hover {
     bottom: -0.45em;
     background-color: #ccc;
     transform: skewY(-65deg);
-  }
-  
-  .switch-left::before {
+}
+
+.switch-left::before {
     left: -0.4em;
-  }
-  
-  .switch-right::before {
+}
+
+.switch-right::before {
     right: -0.375em;
     background-color: transparent;
     transform: skewY(65deg);
-  }
-  
-  input:checked + .switch-left {
+}
+
+input:checked+.switch-left {
     background-color: #0084d0;
     color: #fff;
     bottom: 0px;
@@ -207,14 +207,14 @@ button:hover {
     height: 2.5em;
     width: 3em;
     transform: rotate(0deg) skewX(0deg);
-  }
-  
-  input:checked + .switch-left::before {
+}
+
+input:checked+.switch-left::before {
     background-color: transparent;
     width: 3.0833em;
-  }
-  
-  input:checked + .switch-left + .switch-right {
+}
+
+input:checked+.switch-left+.switch-right {
     background-color: #ddd;
     color: #888;
     bottom: 0.4em;
@@ -222,25 +222,25 @@ button:hover {
     height: 2.4em;
     width: 2.75em;
     transform: rotate(-15deg) skewX(-15deg);
-  }
-  
-  input:checked + .switch-left + .switch-right::before {
+}
+
+input:checked+.switch-left+.switch-right::before {
     background-color: #ccc;
-  }
-  
-  /* Keyboard Users */
-  input:focus + .switch-left {
+}
+
+/* Keyboard Users */
+input:focus+.switch-left {
     color: #333;
-  }
-  
-  input:checked:focus + .switch-left {
+}
+
+input:checked:focus+.switch-left {
     color: #fff;
-  }
-  
-  input:focus + .switch-left + .switch-right {
+}
+
+input:focus+.switch-left+.switch-right {
     color: #fff;
-  }
-  
-  input:checked:focus + .switch-left + .switch-right {
+}
+
+input:checked:focus+.switch-left+.switch-right {
     color: #333;
-  }
+}
