@@ -23,4 +23,4 @@ https://youtu.be/HZpwY9qWm7Q
 - v2.2 : 2.0에서 발견한 다수 버그들을 잡아 안정성을 개선하였습니다.
 
 ## 개발 과정은 블로그에..</br>
-</a> <a href = "https://okane-on-cliff.tistory.com/"> <img alt="Tistory" src ="https://img.shields.io/badge/Tistory-white.svg?&style=for-the-badge"/></a>
+</a> <a href = "https://okane-on-cliff.tistory.com/"> <img alt="Tistory" src ="https://img.shields.io/badge/Tistory-yellow.svg?&style=for-the-badge"/></a>
