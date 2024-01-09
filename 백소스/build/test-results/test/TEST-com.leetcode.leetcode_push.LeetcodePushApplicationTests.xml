@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.leetcode.leetcode_push.LeetcodePushApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-01-08T10:31:42" hostname="DONGHA-GRAM" time="0.878">
+  <properties/>
+  <testcase name="contextLoads()" classname="com.leetcode.leetcode_push.LeetcodePushApplicationTests" time="0.878"/>
+  <system-out><![CDATA[19:31:40.404 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.leetcode.leetcode_push.LeetcodePushApplicationTests]: LeetcodePushApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+19:31:40.487 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.leetcode.leetcode_push.LeetcodePushApplication for test class com.leetcode.leetcode_push.LeetcodePushApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.1.7)
+
+2024-01-08T19:31:40.894+09:00  INFO 4688 --- [    Test worker] c.l.l.LeetcodePushApplicationTests       : Starting LeetcodePushApplicationTests using Java 17.0.9 with PID 4688 (started by gram in C:\Users\gram\Desktop\leetcode_login_helper)
+2024-01-08T19:31:40.896+09:00  INFO 4688 --- [    Test worker] c.l.l.LeetcodePushApplicationTests       : No active profile set, falling back to 1 default profile: "default"
+2024-01-08T19:31:42.241+09:00  INFO 4688 --- [    Test worker] c.l.l.LeetcodePushApplicationTests       : Started LeetcodePushApplicationTests in 1.6 seconds (process running for 2.772)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

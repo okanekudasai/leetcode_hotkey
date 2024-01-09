@@ -1,0 +1,23 @@
+@PostMapping("/makeNewTreeSha")
+    String make_new_tree_sha (@RequestParam("owner") String owner,
+                              @RequestParam("repo") String repo,
+                              @RequestParam("token") String token,
+                              @RequestParam("data") String data) {
+
+        WebClient webClient = WebClient.builder().build();
+        String url = "https://api.github.com/repos/"+owner+"/"+repo+"/git/trees";
+
+        String res = webClient.post()
+                .uri(url)
+                .bodyValue(data)
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        System.out.println(res);
+        JsonElement json = parser.parse(res);
+        String sha = json.getAsJsonObject().get("sha").getAsString();
+        System.out.println(sha);
+        return sha;
+    }
