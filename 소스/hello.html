@@ -29,9 +29,20 @@
         </div>
     </div>
     <div class="bright_div text_center short_margin">
-        <div id="login_button_box" class="short_margin login_bar">
-            <div class="flex_center">
+        <div id="login_button_box" class="short_margin login_bar flex_center">
+            <div id="before_login_try" class="flex_center">
                 <img id="github_image" src="./asset/github.png" width="30" height="30" style="display: block; margin-right: 10px;"><button id="login_button">깃허브 로그인</button>
+            </div>
+            <div id="after_login_try" class="hide flex_center">
+                <div class="short_margin login_bar" style="margin-right: 10px;">
+                    <span class="loader"></span>
+                </div>
+                <div id="repo_make_message">
+                    로그인을 시도 중이에요
+                </div>
+            </div>
+            <div id="failure_of_login_try" class="hide">
+                <img src="./asset/login_failure.png" width="30" height="30" style="margin-right: 10px;"><span>로그인에 실패 했어요</span>
             </div>
         </div>
         <div id="spinner_box" class="hide short_margin login_bar">
@@ -41,8 +52,8 @@
             <!-- <div>(자동푸쉬, 알림)체크박스, 로그아웃, 오늘 푼 문제</div> -->
             <!-- 로그인이 되면 (저장소 만들기, 저장소 방문 - 문제해결 감지 끄기/켜기 체크박스), 로그아웃 -->
             <div class="flex_center" style="margin-bottom: 10px">
-                <div id="make_rep_box" class="flex_center"><img src="./asset/github.png" width="20" height="20" style="display: block; margin-right: 10px;"><button id="make_rep_button" class="repo_button">내 저장소<br>만들기</button></div>
-                <div id="visit_rep_box" class="flex_center"><img src="./asset/github.png" width="20" height="20" style="display: block; margin-right: 10px;"><button id="visit_rep_button" class="repo_button">내 저장소<br>방문</button></div>
+                <div id="make_rep_box" class="flex_center"><img class="github_profile_image" src="./asset/github.png" width="30" height="30" style="display: block; margin-right: 10px;"><button id="make_rep_button" class="repo_button">내 저장소<br>만들기</button></div>
+                <div id="visit_rep_box" class="flex_center"><img class="github_profile_image" src="./asset/github.png" width="30" height="30" style="display: block; margin-right: 10px;"><button id="visit_rep_button" class="repo_button">내 저장소<br>방문</button></div>
                 <div id="check_box_container" class="flex_center">
                     <div style="margin-left: 15px">
                         <label for="solve_detect_check">
@@ -61,7 +72,12 @@
                     <div class="short_margin login_bar" style="margin-right: 10px;">
                         <span class="loader"></span>
                     </div>
-                    <div>리포지토리를 만드는 중이에요<br><span style="font-size: 9px; color: #191919">이 과정은 2분 정도 소요 될 수 있어요</span></div>
+                    <div id="repo_make_message">리포지토리를 만드는 중이에요<br>
+                        <span style="font-size: 9px; color: #191919">이 과정은 4분 정도 소요 될 수 있어요</span><br>
+                        <span id="elapsed_timer" class="hide" style="font-size: 9px; color: #191919">
+                            &#40;경과시간 - <span id="repo_elapsed_time_minute">0</span>:<span id="repo_elapsed_time_second">00</span>&#41;
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="flex_center"><button id="logout_button">로그아웃</button></div>

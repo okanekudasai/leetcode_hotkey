@@ -3,6 +3,7 @@ chrome.runtime.onInstalled.addListener(() => {
     setObj['hot_key'] = 'ControlLeft+Space';
     chrome.storage.local.set(setObj);
     chrome.storage.local.set({basic_directory: "algorithm_auto_push_extension"});
+    chrome.storage.local.remove("repo_pending")
 });
 
 //ControlLeft, ShiftLeft, AltLeft, Space
@@ -24,6 +25,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
         // accesstoken을 받아오는데 실패했다면 창을 닫고 모든 프로세스를 종료해요
         if (token == 'error') {
+            chrome.storage.local.remove("try_login");
+            const channel = new BroadcastChannel('end_try_login');
+            channel.postMessage(false);
+            channel.close();
             return;
         }
 
@@ -33,16 +38,21 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             method: 'GET',
             headers: headers,
         }).then(res => res.json()).then(data => {
+            chrome.storage.local.remove("try_login");
             chrome.storage.local.set({ "token": token });
             chrome.storage.local.set({ "username": JSON.stringify(data) });
             chrome.storage.local.set({ "solve_detect": true })
+            const channel = new BroadcastChannel('end_try_login');
+            channel.postMessage(true);
+            channel.close();
         })
     }
 
     else if (request.action === 'canPendingClose') {
         let token = request.data;
         let basic_directory = request.basic_directory;
-        let cycle = 100;
+        let timer_id = request.timer_id;
+        let cycle = 120;
         let check_new_repository = setInterval(async() => {
             let username = await new Promise((resolve, reject) => {
                 const headers = new Headers();
@@ -69,18 +79,24 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
                 }
             }
 
+            // 팝업이 켜져 있다면 그 팝업에게 얘기하자
             if (flag) {
-                console.log("새로운 레포정보를 가져왔어요!!!", cycle);
+                const channel = new BroadcastChannel('repo_notice');
                 chrome.storage.local.remove("repo_pending");
                 clearInterval(check_new_repository);
 
-                // 팝업이 켜져 있다면 그 팝업에게 얘기하자
-                const channel = new BroadcastChannel('repo_notice');
-                channel.postMessage(true);
+                channel.postMessage({"result":true, "timer_id": timer_id});
                 channel.close();
             }
-            if (cycle-- <= 0) clearInterval(check_new_repository);
-        }, 1500)
+            if (cycle-- <= 0) {
+                const channel = new BroadcastChannel('repo_notice');
+                chrome.storage.local.remove("repo_pending");
+                clearInterval(check_new_repository);
+                
+                channel.postMessage({"result":false, "timer_id": timer_id});
+                channel.close();
+            }
+        }, 2000)
     }
 });
 

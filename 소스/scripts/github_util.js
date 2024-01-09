@@ -269,6 +269,8 @@ ${this.data.code}`
      */
     upload_file = async () => {
 
+        console.log(10);
+
         // 저장소에서 레포지터리 명을 가져와요
         let repo = await new Promise((resolve, reject) => {
             chrome.storage.local.get("basic_directory", result => {
@@ -276,6 +278,7 @@ ${this.data.code}`
             })
         })
 
+        console.log(11);
         // 깃 푸쉬 진행 과정을 보여주기 위한 새로운 요소를 문서에 추가해줘요
         let git_process_bar_position_box = document.createElement('div');
         let git_process_bar_content_box = document.createElement('div');
@@ -308,6 +311,7 @@ ${this.data.code}`
         dont_close_instruction.innerText = "탭을 닫으면 푸쉬가 중지되요"
         git_process_bar_position_box.classList.remove("hide");
 
+        console.log(12);
         await new Promise((resolve, reject) => {
             setTimeout(() =>{
                 resolve(git_process_bar_position_box.classList.add("show_git_process"));

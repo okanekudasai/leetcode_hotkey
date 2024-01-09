@@ -1,4 +1,3 @@
-
 init = () => {
     let link = window.location.href.split("?code=");
     let code = link[1];

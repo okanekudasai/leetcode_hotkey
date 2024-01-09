@@ -7,10 +7,13 @@ document.addEventListener('keydown', function (event) {
 
     // 핫키 배열을 돌며 하나라도 눌린키에 안들어 있다면 동작을 중지해요 
     let flag = true;
-    for (let i of hot_key) {
-        if (!pressed_key.includes(i)) {
-            flag = false;
-            break;
+
+    if (hot_key != undefined && hot_key.length > 0) {
+        for (let i of hot_key) {
+            if (!pressed_key.includes(i)) {
+                flag = false;
+                break;
+            }
         }
     }
 

@@ -251,3 +251,8 @@ input:checked:focus+.switch-left+.switch-right {
     background-color: #f4f4f4;
     padding: 10px;
 }
+
+.github_profile_image {
+    border-radius: 15px;
+    box-shadow: 0 2px 5px 1px #00000033
+}

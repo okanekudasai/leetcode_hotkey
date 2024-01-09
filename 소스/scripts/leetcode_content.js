@@ -27,6 +27,8 @@ let find_raw_code = () => {
  */
 let parsing_process = () => {
 
+    console.log(5);
+
     //데이터를 파싱해요
     let data = parsing_data();
 
@@ -64,16 +66,20 @@ let parsing_data = () => {
  */
 let upload_process = async (data, token) => {
 
+    console.log(7);
+
     // 토큰의 유효성을 검사할께요
     let username = await new Promise(async (resolve, reject) => {
         resolve(is_token_valid(token));
     })
 
     // 만약 토큰의 유효성이 없다면 더이상 진행하지 않아요
-    if(username == 0) return;
+    if (username == 0) return;
+
+    console.log(7 - 1);
 
     // 깃 commit, push api를 사용하기 위해 git 객체를 생성해요
-    let git = new GitHub(data, token, username); 
+    let git = new GitHub(data, token, username);
 
     // 업로드를 시작해요
     git.upload_file();
@@ -82,10 +88,12 @@ let upload_process = async (data, token) => {
 // 문서가 클릭되었을 때 아래 이벤트리스너가 동작해요
 document.addEventListener('click', async (event) => {
 
+    console.log(1);
+
     // 클릭한 버튼을 식별하기 위한 변수에요
     const clickedElement = event.target;
     const dataE2ELocator = clickedElement.getAttribute('data-e2e-locator');
-    
+
     // 누른 버튼이 제출 버튼이 아니라면 넘어 가요
     if (!dataE2ELocator == "console-submit-button") return
 
@@ -95,6 +103,8 @@ document.addEventListener('click', async (event) => {
     })
     if (!is_solve_detect_check) return;
 
+    console.log(2);
+
     // 사용자의 토큰을 찾아요
     let token = await new Promise((resolve, reject) => {
         chrome.storage.local.get("token", result => resolve(result["token"]))
@@ -103,6 +113,8 @@ document.addEventListener('click', async (event) => {
     // 토큰이 없다면 더이상 진행하지 않아요
     if (!token) return;
 
+    console.log(3);
+
     // raw code를 찾아요
     let code = find_raw_code();
 
@@ -110,39 +122,46 @@ document.addEventListener('click', async (event) => {
     // cycle이 0이 되어도 채점이 끝나지 않았다면 오류라고 생각할게요
     let cycle = 60;
 
-    //반복을 시작해요
-    let find_submit_list = setInterval(() => {
+    // 누르자마자 채점 끝난는지 찾지말고 .3초의 텀을둬요
+    setTimeout(async () => {
+        //반복을 시작해요
+        let find_submit_list = setInterval(() => {
 
-        // cycle을 줄여줘요
-        if(cycle-- == 0) clearInterval(find_submit_list);
+            // cycle을 줄여줘요
+            if (cycle-- == 0) clearInterval(find_submit_list);
 
-        // 체점 이 끝나면 아래 요소가 자동으로 생성되요
-        let console_div = document.querySelector('[data-e2e-locator="console-console-button"]');
+            // 체점 이 끝나면 아래 요소가 자동으로 생성되요
+            let console_div = document.querySelector('[data-e2e-locator="console-console-button"]');
 
-        // console_div가 생겼다는 것은 체점이 끝났다는걸 의미해요
-        // 찾지 못했다면 찾는 과정을 반복해요
-        if (console_div == null) return 
+            // console_div가 생겼다는 것은 체점이 끝났다는걸 의미해요
+            // 찾지 못했다면 찾는 과정을 반복해요
+            if (console_div == null) return
 
-        // 찾았다면 반복을 중지해요
-        clearInterval(find_submit_list);
+            // 찾았다면 반복을 중지해요
+            clearInterval(find_submit_list);
 
-        // 1.5초의 시간을 두고(체점이 완료되었다고 파싱할 데이터가 모두 생성된건 아닐 수 있어요)
-        // 데이터 파싱 및 깃허브 푸쉬를 시작해요 
-        setTimeout(async () => {
+            // 1.5초의 시간을 두고(체점이 완료되었다고 파싱할 데이터가 모두 생성된건 아닐 수 있어요)
+            // 데이터 파싱 및 깃허브 푸쉬를 시작해요 
+            setTimeout(async () => {
 
-            // 데이터 파싱해서 변수에 할당해요
-            let data = parsing_process()
+                // 데이터 파싱해서 변수에 할당해요
+                let data = parsing_process()
 
-            // 위 함수에서 파싱하지 못했던 코드도 파싱할게요
-            data["code"] = code;
+                console.log(6);
 
-            // 만약 찾은 데이터가 없다면 작업을 중단해요
-            if (data == 0) return;
+                // 위 함수에서 파싱하지 못했던 코드도 파싱할게요
+                data["code"] = code;
 
-            // 깃허브 푸쉬를 시작해요
-            upload_process(data, token);
-        }, 1500)
-    }, 1000)
+                // 만약 찾은 데이터가 없다면 작업을 중단해요
+                if (data == 0) return;
+
+                // 깃허브 푸쉬를 시작해요
+                upload_process(data, token);
+
+                console.log(8);
+            }, 1500)
+        }, 1000)
+    }, 300)
 })
 
 

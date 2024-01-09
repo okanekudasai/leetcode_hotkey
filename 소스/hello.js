@@ -24,6 +24,8 @@ let init = async () => {
             })
         });
 
+        console.log(username)
+
         // message에는 토큰이 유효하지 않은 등의 로그인 되지 않은 이유가 담겨있어요
         // 즉 message에 뭔가 있다는 건 로그인 되지 않았음을 의미해요
         // message에 아무것도 없다면 username을 그대로 반환해요
@@ -63,8 +65,11 @@ let init = async () => {
         let logout_button_box = document.getElementById('logout_button_box');
         let logout_button = document.getElementById('logout_button');
         let repo_make_pending = document.getElementById('repo_make_pending');
+        let after_login_try = document.getElementById('after_login_try');
+        let before_login_try = document.getElementById('before_login_try');
+        let failure_of_login_try = document.getElementById('failure_of_login_try');
+        let github_profile_images = document.querySelectorAll('.github_profile_image');
 
-        
         /** 저장된 핫키를 불러와서 표시하는 함수에요 */
         let display_hotkey = () => {
             chrome.storage.local.get("hot_key", function (result) {
@@ -73,16 +78,104 @@ let init = async () => {
         }
         display_hotkey();
 
+
         /** background.js에서 call을 받기 위한 객체에요 */
         const channel = new BroadcastChannel('repo_notice');
         channel.onmessage = event => {
-            repo_make_pending.classList.add("hide");
-            visit_rep_box.classList.remove("hide");
-            solve_detect_check.checked = true;
-            check_box_container.classList.remove("hide");
-            chrome.storage.local.set({solve_detect: true});
-            channel.close();
+            // 타이머를 정지 시켜요
+            clearInterval(event.data["timer_id"]);
+            chrome.storage.local.remove("start_time");
+            
+            if (event.data.result) {
+                repo_make_pending.classList.add("hide");
+                visit_rep_box.classList.remove("hide");
+                solve_detect_check.checked = true;
+                check_box_container.classList.remove("hide");
+                chrome.storage.local.set({ solve_detect: true });
+                channel.close();
+            } else {
+                let repo_make_message = document.getElementById("repo_make_message");
+                repo_make_message.innerHTML = "레포지터리 생성에 실패한거 같습니다."
+                setTimeout(() => {
+                    repo_make_pending.classList.add("hide");
+                    make_rep_box.classList.remove("hide");
+                }, 5000)
+            }
         };
+
+        const channel_for_login = new BroadcastChannel('end_try_login');
+        channel_for_login.onmessage = event => {
+            if (event == false) {
+                after_login_try.classList.add("hide");
+                failure_of_login_try.classList.remove('hide');
+                setTimeout(() => {
+                    failure_of_login_try.classList.add("hide");
+                    before_login_try.classList.remove("hide");
+                }, 2000)
+            }
+            
+            else {
+                after_login_try.classList.add("hide");
+                before_login_try.classList.remove("hide");
+            }
+        };
+
+        /** 
+         * 레포지터리 생성 타이머를 작동시켜요 
+         * @return {Number} 타이머의 ID를 반환해요
+         */
+        let run_timer = async () => {
+
+            /** 분을 두자리 수로 만들어주는 함수에요 */
+            let make_secont_number = (number) => {
+                if (number < 10) {
+                    return '0' + number;
+                } else {
+                    return '' + number;
+                }
+            }
+
+            // 경과 타이머를 작동시켜요
+            let start_time = await new Promise((resolve, reject) => {
+                chrome.storage.local.get("start_time", result => resolve(result["start_time"]))
+            });
+
+            let currentDate = new Date();
+            let currentHour = currentDate.getHours();
+            let currentMinute = currentDate.getMinutes();
+            let currentSecond = currentDate.getSeconds();
+            let current_time = currentHour * 60 * 60 + currentMinute * 60 + currentSecond;
+
+            if (start_time == undefined) {
+                chrome.storage.local.set({ "start_time": current_time });
+                start_time = current_time;
+            }
+            
+            else {
+                start_time = Number(start_time);
+                if (start_time > current_time) {
+                    current_time + 86400;
+                }
+            }
+
+            let count = current_time - start_time;
+
+            let repo_elapsed_time_minute = document.getElementById("repo_elapsed_time_minute");
+            let repo_elapsed_time_second = document.getElementById("repo_elapsed_time_second");
+            repo_elapsed_time_minute.innerText = Math.floor(count / 60);
+            repo_elapsed_time_second.innerText = make_secont_number(count % 60);
+            let elapsed_timer = document.getElementById("elapsed_timer");
+            elapsed_timer.classList.remove("hide");
+
+            /** 레포지터리 만들기 버튼을 누루고 난뒤 경과 시간을 다루는 타이머에요 */
+            let maker_repo_timer = setInterval(() => {
+                repo_elapsed_time_minute.innerText = Math.floor(count / 60);
+                repo_elapsed_time_second.innerText = make_secont_number(count % 60);
+                count++;
+            }, 1000)
+
+            return maker_repo_timer;
+        }
 
         /** 현재 단축키를 변경 중인지 알려줘요 */
         let change_state = false;
@@ -106,6 +199,21 @@ let init = async () => {
             spinner_box.classList.remove("hide");
         }
 
+        // 토큰이 없다면 현재로그인 시도중이기 때문인지 확인해요
+        else {
+
+            /** 이 변수가 true라면 현재 백그라운드에서 로그인 시도 중이라는 뜻이에요 */
+            let login_pending = await new Promise((resolve, reject) => {
+                chrome.storage.local.get("try_login", result => resolve(result["try_login"]));
+            })
+
+            // 현재 로그인 시도 중이란 것
+            if (login_pending != undefined) {
+                before_login_try.classList.add("hide");
+                after_login_try.classList.remove("hide");
+            }
+        }
+
         // 토큰의 유효성을 검사해요
         let username = await new Promise((resolve, reject) => {
             resolve(is_token_valid(token));
@@ -116,7 +224,9 @@ let init = async () => {
 
             // 변수를 초기화 해줘요
             token = undefined;
+            chrome.storage.local.remove("token");
             username = undefined;
+            chrome.storage.local.remove("username");
             // 스피너 버튼을 숨기고, 로그인 버튼을 다시 보여줘요
             spinner_box.classList.add("hide");
             login_button_box.classList.remove("hide");
@@ -124,6 +234,14 @@ let init = async () => {
 
         // 토큰이 유효하다면
         else {
+
+            // 프로필이미지로 교체
+            console.log("@@@")
+
+            for (e of github_profile_images) {
+                console.log("@@@@!!");
+                e.src = username.avatar_url
+            }
 
             // repos_url에 있는 레포지터리 리스트를 받아와요
             let repo_list = await fetch(username["repos_url"], {
@@ -142,10 +260,13 @@ let init = async () => {
             // 레포지토리가 이미 있다면 
             if (flag) {
 
+                // 펜딩 하고 있단 상태가 있다면 없애주구요
+                chrome.storage.local.remove("repo_pending");
+
                 // 해결 감지가 켜져 있는지 확인해서 반영해요
                 solve_detect_check.checked = await new Promise((resolve, reject) =>
                     chrome.storage.local.get("solve_detect", result => resolve(result["solve_detect"])
-                ))
+                    ))
 
                 // 스피너, 레포지토리 만들기 버튼을 숨기고
                 spinner_box.classList.add("hide");
@@ -157,7 +278,10 @@ let init = async () => {
 
             // 레포지터리가 없다면
             else {
-                
+
+                // 해결 감지를 삭제해 줘요
+                chrome.storage.local.remove("solve_detect");
+
                 // 스피너, 레포지터리 방문 버튼, 체크박스를 숨기고
                 spinner_box.classList.add("hide");
                 visit_rep_box.classList.add("hide");
@@ -172,6 +296,9 @@ let init = async () => {
                 if (is_repo_pending) {
                     repo_make_pending.classList.remove("hide");
                     make_rep_box.classList.add("hide");
+
+                    // 타이머도 다시 작동시켜요
+                    run_timer();
                 }
 
                 // 최종적으로 로그아웃 버튼 영역을 표시해요
@@ -222,6 +349,7 @@ let init = async () => {
 
         // 로그인 버튼이에요
         login_button.addEventListener('click', () => {
+            chrome.storage.local.set({"try_login": true});
             oAuth2.begin();
             login_button_box.classList.toggle('hide');
             spinner_box.classList.toggle('hide');
@@ -237,7 +365,10 @@ let init = async () => {
             repo_make_pending.classList.remove("hide");
 
             // 현재 팬딩중이란 상황을 알려줘요
-            chrome.storage.local.set({"repo_pending": true});
+            chrome.storage.local.set({ "repo_pending": true });
+
+            /** 경과타이머 아이디에요 */
+            let timer_id = await new Promise((resolve, reject) => resolve(run_timer()));
 
             const apiUrl = 'https://api.github.com/user/repos';
 
@@ -260,13 +391,14 @@ let init = async () => {
             if (data.id != undefined) {
 
                 // 서비스워커한테 계속 username의 repository목록이 갱신됐는지 물어봐요
-                chrome.runtime.sendMessage({ action: 'canPendingClose', data: token, basic_directory: basic_directory });
+                chrome.runtime.sendMessage({ action: 'canPendingClose', data: token, basic_directory: basic_directory, timer_id: timer_id });
             }
 
             // 리포지터리가 만들어 지지 못했다면
             else {
                 make_rep_box.classList.remove("hide");
                 repo_make_pending.classList.add("hide");
+                clearInterval(timer_id)
             }
         })
 
