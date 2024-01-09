@@ -84,7 +84,6 @@ let init = async () => {
         channel.onmessage = event => {
             // 타이머를 정지 시켜요
             clearInterval(event.data["timer_id"]);
-            chrome.storage.local.remove("start_time");
             
             if (event.data.result) {
                 repo_make_pending.classList.add("hide");
@@ -325,9 +324,13 @@ let init = async () => {
         check_button.addEventListener('click', () => {
             toggle_button_show_hide();
             let setObj = {};
-            setObj['hot_key'] = hot_key_to_set.join("+");
+            let joined_hot_key = hot_key_to_set.join("+");
+            setObj['hot_key'] = joined_hot_key;
             chrome.storage.local.set(setObj);
             change_state = false;
+
+            document.getElementById("hot_key_unchanged").classList.add("hide");
+            document.getElementById("hot_key_changed").classList.remove("hide");
         });
 
         // 변경중인 단축키 셋을 바꾸고 자할 때 누르는 버튼이에요

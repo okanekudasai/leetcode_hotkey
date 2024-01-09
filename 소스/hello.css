@@ -24,7 +24,7 @@ body {
     display: none !important;
 }
 
-#current_hot_key {
+.hot_key_big_moji {
     padding: 0 4px;
     height: var(--hot-key-box-size);
     line-height: var(--hot-key-box-size);

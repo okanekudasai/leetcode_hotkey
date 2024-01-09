@@ -79,8 +79,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
                 }
             }
 
+            console.log(cycle)
             // 팝업이 켜져 있다면 그 팝업에게 얘기하자
             if (flag) {
+                chrome.storage.local.remove("start_time");
                 const channel = new BroadcastChannel('repo_notice');
                 chrome.storage.local.remove("repo_pending");
                 clearInterval(check_new_repository);
@@ -89,6 +91,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
                 channel.close();
             }
             if (cycle-- <= 0) {
+                chrome.storage.local.remove("start_time");
                 const channel = new BroadcastChannel('repo_notice');
                 chrome.storage.local.remove("repo_pending");
                 clearInterval(check_new_repository);

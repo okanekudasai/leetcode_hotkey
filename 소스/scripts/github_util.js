@@ -95,7 +95,8 @@ ${this.data.code}`
 
     /**
      * 기본 브랜치를 찾는 함수에요
-     * @returns {String} 기본브랜치 명
+     * @returns {String} 기본브랜치 명 (성공)
+     * @returns {Number} 0 (실패)
      */
     find_default_branch = async (owner, repo) => {
 
@@ -108,12 +109,11 @@ ${this.data.code}`
             },
         });
 
-        if (!repoResponse.ok) {
-            const errorMessage = await repoResponse.text();
-            throw new Error(`Error getting repository details: ${errorMessage}`);
-        }
-
         const repoData = await repoResponse.json();
+
+        if (!repoData.hasOwnProperty("default_branch")) {
+            return 0;
+        }
 
         let defaultBranch = repoData.default_branch;
         return defaultBranch
@@ -121,7 +121,8 @@ ${this.data.code}`
 
     /**
      * 해당 브런치의 마지막 커밋의 해쉬값을 찾는 함수에요
-     * @returns {String} 해쉬값
+     * @returns {String} 해쉬값 (성공)
+     * @returns {Number} 0 (실패)
      */
     find_last_commit_sha = async (owner, default_branch, repo) => {
 
@@ -137,20 +138,21 @@ ${this.data.code}`
             },
         });
 
-        // 실패했는지 판단해요
-        if (!branchResponse.ok) {
-            const errorMessage = await branchResponse.text();
-            throw new Error(`Error getting branch details: ${errorMessage}`);
+        const branchData = await branchResponse.json();
+
+        if (!branchData.hasOwnProperty('object')) {
+            return 0;
         }
 
-        const branchData = await branchResponse.json();
         let currentCommitSha = branchData.object.sha;
+
         return currentCommitSha
     }
 
     /**
      * 이함수를 사용해 베이스 트리의 해쉬값을 찾아요
-     * @return {String} 해쉬값
+     * @return {String} 해쉬값 (성공)
+     * @returns {Number} 0 (실패)
      */
     find_base_tree_sha = async (owner, repo, last_commit_sha) => {
 
@@ -166,19 +168,17 @@ ${this.data.code}`
             },
         });
 
-        // 실패했는지 판단해요
         if (!branchResponse.ok) {
-            const errorMessage = await branchResponse.text();
-            throw new Error(`Error getting branch details: ${errorMessage}`);
+            return 0;
         }
-
         const baseTreeData = await branchResponse.json();
         return baseTreeData.sha
     }
 
     /**
      * 새로운 트리를 만들고 해쉬값을 얻기 위한 함수에요
-     * @return {String} 해쉬값
+     * @return {String} 해쉬값 (성공)
+     * @returns {Number} 0 (실패)
      */
     make_new_tree_sha = async (owner, repo, base_tree_sha) => {
 
@@ -198,18 +198,23 @@ ${this.data.code}`
             body: JSON.stringify(commit_data)
         }).then(res => res.json());
 
+        if (new_tree_sha.sha == undefined) {
+            return 0;
+        }
+
         return new_tree_sha.sha;
     }
 
     /**
      * 정말 커밋이 수행이 되는 함수에요
-     * @return {String} 해쉬값
+     * @return {String} 해쉬값 (성공)
+     * @returns {Number} 0 (실패)
      */
     make_new_commit_sha = async (owner, repo, last_commit_sha, new_tree_sha) => {
-        
+
         // api 주소에요
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/commits`;
-        
+
         // request body 에요
         const commit_data = {
             "parents": [last_commit_sha],
@@ -227,6 +232,10 @@ ${this.data.code}`
             body: JSON.stringify(commit_data)
         }).then(res => res.json());
 
+        if (new_commit_sha.sha == undefined) {
+            return 0;
+        }
+
         return new_commit_sha.sha;
     }
 
@@ -238,7 +247,7 @@ ${this.data.code}`
     make_git_push = async (owner, repo, new_commit_sha, default_branch) => {
         // api 주소에요
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${default_branch}`;
-        
+
         // request body 에요
         const commit_data = {
             "sha": new_commit_sha
@@ -269,8 +278,6 @@ ${this.data.code}`
      */
     upload_file = async () => {
 
-        console.log(10);
-
         // 저장소에서 레포지터리 명을 가져와요
         let repo = await new Promise((resolve, reject) => {
             chrome.storage.local.get("basic_directory", result => {
@@ -278,15 +285,14 @@ ${this.data.code}`
             })
         })
 
-        console.log(11);
         // 깃 푸쉬 진행 과정을 보여주기 위한 새로운 요소를 문서에 추가해줘요
-        let git_process_bar_position_box = document.createElement('div');
-        let git_process_bar_content_box = document.createElement('div');
-        let git_process_bar_flex_box = document.createElement('div');
-        let dont_close_instruction = document.createElement('div');
-        let instruction_box = document.createElement('div');
-        let process_bar_background = document.createElement('div');
-        let process_bar_foreground = document.createElement('div');
+        var git_process_bar_position_box = document.createElement('div');
+        var git_process_bar_content_box = document.createElement('div');
+        var git_process_bar_flex_box = document.createElement('div');
+        var dont_close_instruction = document.createElement('div');
+        var instruction_box = document.createElement('div');
+        var process_bar_background = document.createElement('div');
+        var process_bar_foreground = document.createElement('div');
 
         git_process_bar_position_box.classList.add("git_process_bar_position_box");
         git_process_bar_position_box.classList.add("hide");
@@ -311,51 +317,80 @@ ${this.data.code}`
         dont_close_instruction.innerText = "탭을 닫으면 푸쉬가 중지되요"
         git_process_bar_position_box.classList.remove("hide");
 
-        console.log(12);
         await new Promise((resolve, reject) => {
-            setTimeout(() =>{
+            setTimeout(() => {
                 resolve(git_process_bar_position_box.classList.add("show_git_process"));
             }, 5);
         })
 
+        /** proecess가 끝났음을 알리는 함수에요 */
+        let end_git_process_notice = (s) => {
+
+            instruction_box.innerText = s;
+            dont_close_instruction.innerText = ""
+
+            setTimeout(() => {
+                git_process_bar_position_box.classList.remove("show_git_process");
+                setTimeout(() => {
+                    git_process_bar_position_box.classList.add("hide");
+                }, 500)
+            }, 2000)
+        }
+
         instruction_box.innerText = "기본브랜치를 찾고 있어요";
         // 기본브랜치를 찾아요
-        let default_branch = await this.find_default_branch(this.username.login, repo);
+        let default_branch = await new Promise((resolve, reject) => resolve(this.find_default_branch(this.username.login, repo)));
         process_bar_foreground.style.width = "10%"
+        if (default_branch == 0) {
+            end_git_process_notice("기본 브랜치를 찾을 수 없어 중단 됐어요..");
+            return;
+        }
 
         instruction_box.innerText = "이전 커밋의 해쉬값을 찾고 있어요";
         // 기본 브랜치의 마지막 커밋의 해쉬값을 찾아요
-        let last_commit_sha = await this.find_last_commit_sha(this.username.login, default_branch, repo);
+        let last_commit_sha = await new Promise((resolve, reject) => resolve(this.find_last_commit_sha(this.username.login, default_branch, repo)));
         process_bar_foreground.style.width = "25%"
+        if (last_commit_sha == 0) {
+            end_git_process_notice("이전 커밋의 해쉬값을 찾을 수 없어요..");
+            return;
+        }
 
         instruction_box.innerText = "베이스 트리의 해쉬값을 찾고 있어요";
         // 찾은 해쉬값을 이용해 베이스 트리의 해쉬값을 찾아요
-        let base_tree_sha = await this.find_base_tree_sha(this.username.login, repo, last_commit_sha);
+        let base_tree_sha = await new Promise((resolve, reject) => resolve(this.find_base_tree_sha(this.username.login, repo, last_commit_sha)));
         process_bar_foreground.style.width = "45%"
-        
+        if (base_tree_sha == 0) {
+            end_git_process_notice("베이스 트리의 해쉬값을 찾을 수 없어요..");
+            return;
+        }
+
         instruction_box.innerText = "커밋할 파일을 만들고 있어요";
         // 베이스 트리에 커밋하고자 하는 파일을 적어요
-        let new_tree_sha = await this.make_new_tree_sha(this.username.login, repo, base_tree_sha);
+        let new_tree_sha = await new Promise((resolve, reject) => resolve(this.make_new_tree_sha(this.username.login, repo, base_tree_sha)));
         process_bar_foreground.style.width = "60%"
-        
+        if (new_tree_sha == 0) {
+            end_git_process_notice("새로운 트리를 만들 수 없어요..");
+            return;
+        }
+
         instruction_box.innerText = "새로운 커밋의 해쉬값을 얻고 있어요";
         // 정말 커밋이 이루어져요. 새로운 커밋의 해쉬값을 얻어요
-        let new_commit_sha = await this.make_new_commit_sha(this.username.login, repo, last_commit_sha, new_tree_sha);
+        let new_commit_sha = await new Promise((resolve, reject) => resolve(this.make_new_commit_sha(this.username.login, repo, last_commit_sha, new_tree_sha)));
         process_bar_foreground.style.width = "90%"
-        
+        if (new_commit_sha == 0) {
+            end_git_process_notice("커밋에 실패 했어요..");
+            return;
+        }
+
         instruction_box.innerText = "푸쉬중이에요";
         // 푸쉬가 이루어 져요
-        let push_result = await this.make_git_push(this.username.login, repo, new_commit_sha, default_branch)
+        let push_result = await new Promise((resolve, reject) => resolve(this.make_git_push(this.username.login, repo, new_commit_sha, default_branch)));
         process_bar_foreground.style.width = "100%"
-        
-        instruction_box.innerText = "푸쉬가 완료되었어요!";
+        if (push_result == 0) {
+            end_git_process_notice("푸쉬에 실패 했어요..");
+            return;
+        }
 
-        setTimeout(() => {
-            let h = -git_process_bar_position_box.offsetHeight -8;
-            git_process_bar_position_box.classList.remove("show_git_process");
-            setTimeout(() => {
-                git_process_bar_position_box.classList.add("hide");
-            }, 500)
-        }, 2000)
+        end_git_process_notice("푸쉬가 완료되었어요!");
     }
 }

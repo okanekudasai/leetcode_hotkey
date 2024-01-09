@@ -3,6 +3,7 @@
  */
 var run_button_click = () => {
     var leetcode_run = document.querySelector('[data-e2e-locator="console-run-button"]');
+
     leetcode_run.click();
 }
 
@@ -26,8 +27,6 @@ let find_raw_code = () => {
  * @return {object} - Accept 됨
  */
 let parsing_process = () => {
-
-    console.log(5);
 
     //데이터를 파싱해요
     let data = parsing_data();
@@ -66,8 +65,6 @@ let parsing_data = () => {
  */
 let upload_process = async (data, token) => {
 
-    console.log(7);
-
     // 토큰의 유효성을 검사할께요
     let username = await new Promise(async (resolve, reject) => {
         resolve(is_token_valid(token));
@@ -75,8 +72,6 @@ let upload_process = async (data, token) => {
 
     // 만약 토큰의 유효성이 없다면 더이상 진행하지 않아요
     if (username == 0) return;
-
-    console.log(7 - 1);
 
     // 깃 commit, push api를 사용하기 위해 git 객체를 생성해요
     let git = new GitHub(data, token, username);
@@ -88,22 +83,18 @@ let upload_process = async (data, token) => {
 // 문서가 클릭되었을 때 아래 이벤트리스너가 동작해요
 document.addEventListener('click', async (event) => {
 
-    console.log(1);
-
     // 클릭한 버튼을 식별하기 위한 변수에요
     const clickedElement = event.target;
     const dataE2ELocator = clickedElement.getAttribute('data-e2e-locator');
 
     // 누른 버튼이 제출 버튼이 아니라면 넘어 가요
-    if (!dataE2ELocator == "console-submit-button") return
+    if (dataE2ELocator != "console-submit-button") return
 
     // 해결 감지가 켜져있는지 확인 해요 꺼져있다면 더이상 진행하지 않아요
     let is_solve_detect_check = await new Promise((resolve, reject) => {
         chrome.storage.local.get("solve_detect", (result) => resolve(result["solve_detect"]))
     })
     if (!is_solve_detect_check) return;
-
-    console.log(2);
 
     // 사용자의 토큰을 찾아요
     let token = await new Promise((resolve, reject) => {
@@ -112,8 +103,6 @@ document.addEventListener('click', async (event) => {
 
     // 토큰이 없다면 더이상 진행하지 않아요
     if (!token) return;
-
-    console.log(3);
 
     // raw code를 찾아요
     let code = find_raw_code();
@@ -147,8 +136,6 @@ document.addEventListener('click', async (event) => {
                 // 데이터 파싱해서 변수에 할당해요
                 let data = parsing_process()
 
-                console.log(6);
-
                 // 위 함수에서 파싱하지 못했던 코드도 파싱할게요
                 data["code"] = code;
 
@@ -158,7 +145,6 @@ document.addEventListener('click', async (event) => {
                 // 깃허브 푸쉬를 시작해요
                 upload_process(data, token);
 
-                console.log(8);
             }, 1500)
         }, 1000)
     }, 300)

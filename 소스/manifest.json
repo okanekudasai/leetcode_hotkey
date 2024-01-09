@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "리트코드 실행 핫키",
+  "name": "솔브커밋",
   "description": "리트코드를 자동 푸쉬해요. Run버튼에 단축키를 달아줄게요",
-  "version": "2.1",
+  "version": "2.2",
   "action": {
     "default_popup": "hello.html"
   },
