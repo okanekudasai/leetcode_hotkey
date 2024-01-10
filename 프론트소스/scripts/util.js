@@ -1,3 +1,4 @@
+
 var hot_key = "";
 chrome.storage.local.get("hot_key", (result) => {
     hot_key = result["hot_key"].split("+");

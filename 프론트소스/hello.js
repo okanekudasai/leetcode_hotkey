@@ -24,8 +24,6 @@ let init = async () => {
             })
         });
 
-        console.log(username)
-
         // message에는 토큰이 유효하지 않은 등의 로그인 되지 않은 이유가 담겨있어요
         // 즉 message에 뭔가 있다는 건 로그인 되지 않았음을 의미해요
         // message에 아무것도 없다면 username을 그대로 반환해요
@@ -235,10 +233,8 @@ let init = async () => {
         else {
 
             // 프로필이미지로 교체
-            console.log("@@@")
 
             for (e of github_profile_images) {
-                console.log("@@@@!!");
                 e.src = username.avatar_url
             }
 

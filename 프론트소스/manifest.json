@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "솔브커밋",
   "description": "리트코드를 자동 푸쉬해요. Run버튼에 단축키를 달아줄게요",
-  "version": "2.2",
+  "version": "2.25",
   "action": {
     "default_popup": "hello.html"
   },

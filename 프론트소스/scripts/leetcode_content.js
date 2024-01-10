@@ -11,9 +11,18 @@ var run_button_click = () => {
  * raw 코드를 찾는 함수에요
  * @returns {String} code
  */
-let find_raw_code = () => {
-    let code_parent = document.querySelector("#qd-content").firstChild.nextElementSibling.nextElementSibling.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.nextElementSibling.nextElementSibling.firstChild.firstChild.firstChild.firstChild.firstChild.nextElementSibling.firstChild.firstChild.nextElementSibling.nextElementSibling.nextElementSibling;
+let find_raw_code = async () => {
     let code = "";
+
+    let code_parent = await new Promise((resolve, reject) => {
+        let find_code = setInterval(() => {
+            let el = document.querySelector("code");
+            if (el == null) return;
+            clearInterval(find_code);
+            resolve(el);
+        }, 100)
+    });
+        
     for (i of code_parent.children) {
         code += i.innerText;
         code += "\n"
@@ -52,11 +61,11 @@ let parsing_data = () => {
     } else {
         title = "문제 이름을 찾을 수 없습니다.";
     }
-    let last_submit = document.querySelector("#qd-content").firstChild.firstChild.firstChild.firstChild.firstChild.nextElementSibling.firstChild.firstChild.nextElementSibling.nextElementSibling.firstChild;
-    let result = last_submit.firstChild.firstChild.firstChild.firstChild.firstChild.innerText;
-    let lang = last_submit.firstChild.firstChild.nextElementSibling.firstChild.innerText;
-    let velocity = last_submit.firstChild.firstChild.nextElementSibling.nextElementSibling.firstChild.nextElementSibling.innerText;
-    let memory = last_submit.firstChild.firstChild.nextElementSibling.nextElementSibling.nextElementSibling.firstChild.nextElementSibling.innerText;
+    let result = document.querySelector("[data-e2e-locator='submission-result']").innerText;
+    let lang = document.querySelector("code").parentElement.parentElement.parentElement.previousElementSibling.innerText;
+    let run_info = document.querySelectorAll("span.text-sd-foreground.text-lg.font-semibold");
+    let velocity = run_info[0].innerText + "ms";
+    let memory = run_info[1].innerText + "MB";
     return { title, result, velocity, memory, lang };
 }
 
@@ -80,16 +89,8 @@ let upload_process = async (data, token) => {
     git.upload_file();
 }
 
-// 문서가 클릭되었을 때 아래 이벤트리스너가 동작해요
-document.addEventListener('click', async (event) => {
-
-    // 클릭한 버튼을 식별하기 위한 변수에요
-    const clickedElement = event.target;
-    const dataE2ELocator = clickedElement.getAttribute('data-e2e-locator');
-
-    // 누른 버튼이 제출 버튼이 아니라면 넘어 가요
-    if (dataE2ELocator != "console-submit-button") return
-
+let let_submit = async () => {
+    
     // 해결 감지가 켜져있는지 확인 해요 꺼져있다면 더이상 진행하지 않아요
     let is_solve_detect_check = await new Promise((resolve, reject) => {
         chrome.storage.local.get("solve_detect", (result) => resolve(result["solve_detect"]))
@@ -105,50 +106,48 @@ document.addEventListener('click', async (event) => {
     if (!token) return;
 
     // raw code를 찾아요
-    let code = find_raw_code();
+    let code = await new Promise((resolve, reject) => resolve(find_raw_code()));
 
     // 채점을 몇초동안 할 것인지를 정하는 변수에요
     // cycle이 0이 되어도 채점이 끝나지 않았다면 오류라고 생각할게요
-    let cycle = 60;
 
-    // 누르자마자 채점 끝난는지 찾지말고 .3초의 텀을둬요
+    // 1.5초의 시간을 두고(체점이 완료되었다고 파싱할 데이터가 모두 생성된건 아닐 수 있어요)
+    // 데이터 파싱 및 깃허브 푸쉬를 시작해요 
     setTimeout(async () => {
-        //반복을 시작해요
-        let find_submit_list = setInterval(() => {
 
-            // cycle을 줄여줘요
-            if (cycle-- == 0) clearInterval(find_submit_list);
+        // 데이터 파싱해서 변수에 할당해요
+        let data = parsing_process()
 
-            // 체점 이 끝나면 아래 요소가 자동으로 생성되요
-            let console_div = document.querySelector('[data-e2e-locator="console-console-button"]');
+        // 만약 찾은 데이터가 없다면 작업을 중단해요
+        if (data == 0) return;
 
-            // console_div가 생겼다는 것은 체점이 끝났다는걸 의미해요
-            // 찾지 못했다면 찾는 과정을 반복해요
-            if (console_div == null) return
+        // 위 함수에서 파싱하지 못했던 코드도 파싱할게요
+        data["code"] = code;
+        
+        // 깃허브 푸쉬를 시작해요
+        upload_process(data, token);
 
-            // 찾았다면 반복을 중지해요
-            clearInterval(find_submit_list);
+    }, 1500)
+}
 
-            // 1.5초의 시간을 두고(체점이 완료되었다고 파싱할 데이터가 모두 생성된건 아닐 수 있어요)
-            // 데이터 파싱 및 깃허브 푸쉬를 시작해요 
-            setTimeout(async () => {
+// 옵저브할 대상 요소를 선택합니다.
+var targetElement = undefined;
+var find_submit_button = setInterval(() => {
+    targetElement = document.querySelector('[data-e2e-locator="console-submit-button"]');
+    if (targetElement == null) return;
+    // 대상 요소와 설정을 사용하여 옵저버를 시작합니다.
+    observer.observe(targetElement, config);
+    clearInterval(find_submit_button);
+}, 100)
 
-                // 데이터 파싱해서 변수에 할당해요
-                let data = parsing_process()
+// MutationObserver를 생성하고 콜백 함수를 정의합니다.
+var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (targetElement.classList.length == 14) let_submit();
+        }
+    });
+});
 
-                // 위 함수에서 파싱하지 못했던 코드도 파싱할게요
-                data["code"] = code;
-
-                // 만약 찾은 데이터가 없다면 작업을 중단해요
-                if (data == 0) return;
-
-                // 깃허브 푸쉬를 시작해요
-                upload_process(data, token);
-
-            }, 1500)
-        }, 1000)
-    }, 300)
-})
-
-
-
+// 옵저버가 감시할 설정을 정의합니다.
+var config = { attributes: true, attributeFilter: ['class'] };
