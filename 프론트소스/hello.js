@@ -454,6 +454,16 @@ let init = async () => {
             }
             current_hot_key.innerText = hot_key_to_set.join(" + ");
         })
+
+        let tb = document.getElementById("tb");
+        tb.addEventListener("click", () => {
+            let ddd = document.createElement("div");
+            ddd.style.width = "100px";
+            ddd.style.height = "100px";
+            ddd.style.background = "red";
+            document.body.appendChild(ddd);
+        })
     })
 }
 init();
+

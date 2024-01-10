@@ -21,7 +21,7 @@ class GitHub {
      * @returns {String} 날짜
      */
     make_today = (date) => {
-        return date.year + "/" + date.month + "/" + date.day;
+        return date.year + "-" + date.month + "-" + date.day;
     }
 
     /**
@@ -30,7 +30,7 @@ class GitHub {
      * @returns {String} 시간
      */
     make_time = (date) => {
-        return date.hour + ":" + date.minute + "/" + date.second;
+        return date.hour + ":" + date.minute + ":" + date.second;
     }
 
     /**
