@@ -131,7 +131,6 @@ let init = async () => {
             } else if (event.action == "fail_process") {
                 git_process_instruction.innerText = "깃 푸쉬가 실패했어요";
                 process_bar_foreground.style.background = "red";
-                chrome.storage.local.remove("git_pending"); 
                 setTimeout(() => {
                     git_pending_box.classList.add("hide");
                 }, 3000)
@@ -139,7 +138,6 @@ let init = async () => {
                 git_process_instruction.innerText = event.msg;
                 process_bar_foreground.style.width = event.rate;
                 if (event.rate == "100%") {
-                    chrome.storage.local.remove("git_pending"); 
                     setTimeout(() => {
                         git_pending_box.classList.add("hide");
                     }, 3000)

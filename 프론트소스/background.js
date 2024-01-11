@@ -465,6 +465,7 @@ ${this.data.code}`
 
         /** 푸쉬 프로세스 중 중단 되었을 경우 앱을 초기화 시켜줘요 */
         let process_fail = () => {
+            chrome.storage.local.remove("git_pending"); 
             // 로그아웃
             chrome.storage.local.remove("token");
             chrome.storage.local.remove("username");
@@ -529,7 +530,7 @@ ${this.data.code}`
         this.channel.postMessage({action: "progress", rate: "100%", msg: "푸쉬에 성공했어요"});
         make_notify("푸쉬 성공!");
 
-
+        chrome.storage.local.remove("git_pending"); 
         this.channel.close();
     }
 }
