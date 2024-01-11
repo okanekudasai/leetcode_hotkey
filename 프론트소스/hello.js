@@ -293,6 +293,9 @@ let init = async () => {
                 // 펜딩 하고 있단 상태가 있다면 없애주구요
                 chrome.storage.local.remove("repo_pending");
 
+                // 리포 펜딩 타이머도 초기화 해줘요
+                chrome.storage.local.remove("start_time");
+
                 // 해결 감지가 켜져 있는지 확인해서 반영해요
                 solve_detect_check.checked = await new Promise((resolve, reject) =>
                     chrome.storage.local.get("solve_detect", result => resolve(result["solve_detect"])

@@ -147,7 +147,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
                 let git = new GitHub(data, request.data.token, JSON.parse(request.data["username_from_storage"]));
                 git.upload_file();
             }
-        }, 20000)
+        }, 30000)
     }
 });
 
