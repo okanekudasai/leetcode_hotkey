@@ -29,6 +29,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         },100)
     } else if (request['git_fail']) {
         make_notify("다시 로그인 해 주세요");
+    } else if (request['git_success']) {
+        make_notify("깃 푸쉬에 성공했어요");
     }
 });
 
@@ -453,6 +455,7 @@ ${this.data.code}`
      */
     upload_file = async () => {
 
+        console.log("ehckr");
         // 저장소에서 레포지터리 명을 가져와요
         let repo = await new Promise((resolve, reject) => {
             chrome.storage.local.get("basic_directory", result => {

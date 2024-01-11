@@ -27,10 +27,12 @@ let find_raw_code = async () => {
  * @return 0 - Accept가 안됨
  * @return {object} - Accept 됨
  */
-let parsing_process = () => {
+let parsing_process = async () => {
 
     //데이터를 파싱해요
-    let data = parsing_data();
+    let data = await new Promise((resolve, reject) => {
+        resolve(parsing_data());
+    })
 
     // 파싱데이터에서 해결여부를 찾아 해결한 것이 아닐 경우 넘어가요
     if (data.result != "Accepted") return 0;
@@ -44,7 +46,7 @@ let parsing_process = () => {
  * 데이터를 파싱하기 위한 함수에요
  * @return 문제제목, 결과, 속도, 메모리, 언어를 제공해요
  */
-let parsing_data = () => {
+let parsing_data = async () => {
     let currentURL = window.location.href;
     let title;
     let problemName = currentURL.split('/')[4];
@@ -53,12 +55,20 @@ let parsing_data = () => {
     } else {
         title = "문제 이름을 찾을 수 없습니다.";
     }
-    let result = document.querySelector("[data-e2e-locator='submission-result']").innerText;
-    let lang = document.querySelector("code").parentElement.parentElement.parentElement.previousElementSibling.innerText;
-    let run_info = document.querySelectorAll("span.text-sd-foreground.text-lg.font-semibold");
-    let velocity = run_info[0].innerText + "ms";
-    let memory = run_info[1].innerText + "MB";
-    return { title, result, velocity, memory, lang };
+    let data = await new Promise((resolve, reject) => setTimeout(() => {
+        let result = document.querySelector("[data-e2e-locator='submission-result']").innerText;
+        let lang = undefined;
+        try {
+            lang = document.querySelectorAll("code")[11].parentElement.parentElement.parentElement.parentElement.firstChild.innerText;
+        } catch (error) {
+            lang = document.querySelector("code").parentElement.parentElement.parentElement.previousElementSibling.innerText;
+        }
+        let run_info = document.querySelectorAll("span.text-sd-foreground.text-lg.font-semibold");
+        let velocity = run_info[0].innerText + "ms";
+        let memory = run_info[1].innerText + "MB";
+        resolve ({ title, result, velocity, memory, lang });
+    }, 1000))
+    return data;
 }
 
 /**
@@ -108,14 +118,13 @@ let let_submit = async () => {
     setTimeout(async () => {
 
         // 데이터 파싱해서 변수에 할당해요
-        let data = parsing_process()
+        let data = await new Promise((resolve, reject) => resolve(parsing_process()));
 
         // 만약 찾은 데이터가 없다면 작업을 중단해요
         if (data == 0) return;
 
         // 위 함수에서 파싱하지 못했던 코드도 파싱할게요
         data["code"] = code;
-        
         // 깃허브 푸쉬를 시작해요
         upload_process(data, token);
 

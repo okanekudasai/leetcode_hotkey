@@ -68,13 +68,21 @@ class GitHub {
             'JavaScript': ['.js', '//']
         }
 
+        this.data.lang = "1111";
+        let file_extension = "";
+        let file_annotation = "//";
+        if (this.data.lang in lang_helper) {
+            file_extension = lang_helper[this.data.lang][0];
+            file_annotation = lang_helper[this.data.lang][1];
+        }
+
         // 파일의 경로에요
-        let path = this.today + "/" + this.data.title + lang_helper[this.data.lang][0];
+        let path = this.today + "/" + this.data.title + file_extension;
 
         // 파일의 내용이에요
-        let content = `${lang_helper[this.data.lang][1]} 문제 : ${this.data.title}
-${lang_helper[this.data.lang][1]} 결과 : ${this.data.result} / 속도: ${this.data.velocity} / 메모리 : ${this.data.memory}
-${lang_helper[this.data.lang][1]} 제출시각 : ${this.today}  ${this.time}
+        let content = `${file_annotation} 문제 : ${this.data.title}
+${file_annotation} 결과 : ${this.data.result} / 속도: ${this.data.velocity} / 메모리 : ${this.data.memory}
+${file_annotation} 제출시각 : ${this.today}  ${this.time}
 ${this.data.code}`
 
         let data = {
@@ -127,7 +135,7 @@ ${this.data.code}`
     find_last_commit_sha = async (owner, default_branch, repo) => {
 
         // 마지막 커밋의 해쉬를 얻기 위한 api 주소에요
-        const branchUrl = `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${default_branch}1`;
+        const branchUrl = `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${default_branch}`;
 
         // http 요청을 보내요
         const branchResponse = await fetch(branchUrl, {
@@ -219,7 +227,7 @@ ${this.data.code}`
         const commit_data = {
             "parents": [last_commit_sha],
             "tree": new_tree_sha,
-            "message": 'auth_commited'
+            "message": '(auto_commited) ' + this.data.title
         };
 
         // http 요청을 보내요
@@ -288,6 +296,7 @@ ${this.data.code}`
         // 깃 푸쉬 진행 과정을 보여주기 위한 새로운 요소를 문서에 추가해줘요
         var git_process_bar_position_box = document.createElement('div');
         var git_process_bar_content_box = document.createElement('div');
+        var git_process_bar_close_box = document.createElement('div');
         var git_process_bar_flex_box = document.createElement('div');
         var dont_close_instruction = document.createElement('div');
         var instruction_box = document.createElement('div');
@@ -298,6 +307,7 @@ ${this.data.code}`
         git_process_bar_position_box.classList.add("hide");
         git_process_bar_content_box.classList.add("git_process_bar_content_box");
         git_process_bar_content_box.classList.add("flex_center");
+        git_process_bar_close_box.classList.add("git_process_bar_close_box")
         git_process_bar_flex_box.classList.add("git_process_bar_flex_box");
         dont_close_instruction.classList.add("dont_close_instruction");
         instruction_box.classList.add("instruction_box");
@@ -307,14 +317,22 @@ ${this.data.code}`
         document.body.appendChild(git_process_bar_position_box);
         git_process_bar_position_box.appendChild(git_process_bar_content_box);
         git_process_bar_content_box.appendChild(git_process_bar_flex_box);
+        git_process_bar_content_box.appendChild(git_process_bar_close_box);
         git_process_bar_flex_box.appendChild(dont_close_instruction);
         git_process_bar_flex_box.appendChild(instruction_box);
         git_process_bar_flex_box.appendChild(process_bar_background);
         process_bar_background.appendChild(process_bar_foreground);
 
         process_bar_foreground.style.width = "0"
+        git_process_bar_close_box.innerText = "X";
+        git_process_bar_close_box.addEventListener("click", () => {
+            git_process_bar_position_box.classList.remove("show_git_process");
+            setTimeout(() => {
+                git_process_bar_position_box.classList.add("hide");
+            }, 500)
+        })
 
-        dont_close_instruction.innerText = "탭을 닫으면 푸쉬가 중지되요"
+        dont_close_instruction.innerText = "진행창을 닫아도 푸쉬는 진행되요\n코딩테스트 페이지를 닫으면 푸쉬는 중단되요"
         git_process_bar_position_box.classList.remove("hide");
 
         await new Promise((resolve, reject) => {
@@ -418,5 +436,6 @@ ${this.data.code}`
         }
 
         end_git_process_notice("푸쉬가 완료되었어요!");
+        chrome.runtime.sendMessage({ "git_success": true })
     }
 }

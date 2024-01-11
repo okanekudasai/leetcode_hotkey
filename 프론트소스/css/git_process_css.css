@@ -14,6 +14,7 @@
     height: 90px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.212);
     transition: all 0.4s;
+    position: relative;
 }
 
 .git_process_bar_content_box:hover {
@@ -75,4 +76,23 @@
 
 .notice_content_box:hover {
     opacity: 0.2;
+}
+
+.git_process_bar_close_box {
+    position: absolute; top:5px; right: 5px;
+    background-color: rgb(226, 139, 139);
+    color: white;
+    font-weight: bolder;
+    height: 15px;
+    width: 15px;
+    font-size: 10px;
+    line-height: 15px;
+    text-align: center;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.git_process_bar_close_box:hover {
+    background-color: rgb(194, 87, 87);
+    cursor: pointer;
 }
