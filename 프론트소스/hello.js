@@ -43,6 +43,7 @@ let init = async () => {
     document.addEventListener('DOMContentLoaded', async () => {
 
         // 팝업의 요소를 맵핑해요
+        let hot_key_box = document.getElementById('hot_key_box');
         let current_hot_key = document.getElementById('current_hot_key');
         let change_button = document.getElementById('change_button');
         let check_button = document.getElementById('check_button');
@@ -67,6 +68,12 @@ let init = async () => {
         let before_login_try = document.getElementById('before_login_try');
         let failure_of_login_try = document.getElementById('failure_of_login_try');
         let github_profile_images = document.querySelectorAll('.github_profile_image');
+        let git_pending_box = document.getElementById("git_pending_box");
+        let git_process_instruction = document.getElementById("git_process_instruction");
+        let process_bar_foreground = document.querySelector(".process_bar_foreground");
+        let patch_note_box = document.querySelector("#patch_note_box");
+        let patch_note_button = document.querySelector("#patch_note_button");
+        let patch_note_close_button = document.querySelector("#patch_note_close_button");
 
         /** 저장된 핫키를 불러와서 표시하는 함수에요 */
         let display_hotkey = () => {
@@ -75,7 +82,6 @@ let init = async () => {
             });
         }
         display_hotkey();
-
 
         /** background.js에서 call을 받기 위한 객체에요 */
         const channel = new BroadcastChannel('repo_notice');
@@ -116,6 +122,37 @@ let init = async () => {
                 before_login_try.classList.remove("hide");
             }
         };
+
+        const channel_for_git_process = new BroadcastChannel('git_pending_process');
+        channel_for_git_process.onmessage = async (event) => {
+            event = event.data;
+            if (event.action == "start_process") {
+                git_pending_box.classList.remove("hide");
+            } else if (event.action == "fail_process") {
+                git_process_instruction.innerText = "깃 푸쉬가 실패했어요";
+                process_bar_foreground.style.background = "red";
+                chrome.storage.local.remove("git_pending"); 
+                setTimeout(() => {
+                    git_pending_box.classList.add("hide");
+                }, 3000)
+            } else if(event.action == "progress") {
+                git_process_instruction.innerText = event.msg;
+                process_bar_foreground.style.width = event.rate;
+                if (event.rate == "100%") {
+                    chrome.storage.local.remove("git_pending"); 
+                    setTimeout(() => {
+                        git_pending_box.classList.add("hide");
+                    }, 3000)
+                }
+            }
+        }
+
+        const channel_for_display_hotkey = new BroadcastChannel('display_hot_key_box');
+        channel_for_display_hotkey.onmessage = async (event) => {
+            hot_key_box.classList.remove("hide");
+            channel_for_display_hotkey.postMessage({hotkey_interval_id: event.data.hotkey_interval_id});
+            channel_for_display_hotkey.close();
+        }
 
         /** 
          * 레포지터리 생성 타이머를 작동시켜요 
@@ -455,13 +492,27 @@ let init = async () => {
             current_hot_key.innerText = hot_key_to_set.join(" + ");
         })
 
-        let tb = document.getElementById("tb");
-        tb.addEventListener("click", () => {
-            let ddd = document.createElement("div");
-            ddd.style.width = "100px";
-            ddd.style.height = "100px";
-            ddd.style.background = "red";
-            document.body.appendChild(ddd);
+        let pending_git_now = await new Promise((resolve, reject) => {
+            chrome.storage.local.get("git_pending", result => resolve(result["git_pending"]));
+        })
+        if (pending_git_now != undefined) {
+            let git_message = await new Promise((resolve, reject) => {
+                chrome.storage.local.get("git_message", result => resolve(result["git_message"]));
+            })
+            let progress_rate = await new Promise((resolve, reject) => {
+                chrome.storage.local.get("progress_rate", result => resolve(result["progress_rate"]));
+            })
+            git_process_instruction.innerText = git_message;
+            process_bar_foreground.style.width = progress_rate;
+            git_pending_box.classList.remove("hide");
+        }
+        
+        patch_note_button.addEventListener("click", () => {
+            patch_note_box.classList.remove("hide")
+        })
+
+        patch_note_close_button.addEventListener("click", () => {
+            patch_note_box.classList.add("hide")
         })
     })
 }

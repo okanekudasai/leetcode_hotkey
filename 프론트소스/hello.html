@@ -7,15 +7,56 @@
     <script src="./hello.js"></script>
     <script src="./util/oAuth.js"></script>
     <link rel="stylesheet" href="hello.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
 
 <body style="background-color: #eeeeee;">
-    <div class="bright_div text_center short_margin">
-        <div style="margin-bottom: 4px;">이 확장프로그램이 설치되있으면</div>
-        <div>1.성공 코드가 내 저장소에 자동 푸쉬되요</div>
-        <div>2.Run버튼을 단축키로 실행 할 수 있어요</div>
+    <div class="bright_div text_center short_margin" style="position: relative">
+        <div>이 확장프로그램이 설치되있으면</div>
+        <div style="text-align: center; display: flex; justify-content: space-evenly; flex-wrap: wrap; margin: 15px 0;">
+            <div>
+                <div style="font-weight: bold;">
+                    리트코드
+                </div>
+                <div>
+                    자동푸쉬
+                </div>
+            </div>
+            <div>
+                <div style="font-weight: bold;">
+                    프로그래머스
+                </div>
+                <div>
+                    자동푸쉬
+                </div>
+                <div>
+                    단축키
+                </div>
+            </div>
+            <div>
+                <div style="font-weight: bold;">
+                    백준
+                </div>
+                <div>
+                    자동푸쉬
+                </div>
+            </div>
+        </div>
+        <div>
+            기능이 제공되요
+        </div>
+        <div id="patch_note_button" class="flex_center">
+            <div class="material-symbols-outlined" style="font-size: 20px;">
+                text_snippet
+            </div>
+        </div>
     </div>
-    <div class="bright_div text_center">
+    <div id="patch_note_box" class="bright_div text_center hide" style="position: relative">
+        <div id="patch_note_close_button">X</div>
+        <div style="font-weight: bold; margin-bottom: 4px;">&lt;v3.0 패치노트&gt;</div>
+        <div>1. 솔브 커밋이 출시되었어요</div>
+    </div>
+    <div id="hot_key_box" class="bright_div text_center hide">
         <div id="hot_key_unchanged">
             <div id="state_complete">현재 실행 단축키</div>
             <div id="state_change" class="hide">변경중...(키를 하나씩 눌러주세요)</div>
@@ -96,9 +137,16 @@
                 </div>
             </div>
             <div class="flex_center"><button id="logout_button">로그아웃</button></div>
-
-            <button id="tb">눌러바</button>
-
+        </div>
+    </div>
+    <div id="git_pending_box" class="bright_div text_center short_margin flex_center hide">
+        <div style="width: 90%; padding: 10px;">
+            <div id="git_process_instruction" style="margin-bottom: 10px;">
+                
+            </div>
+            <div class="process_bar_background">
+                <div class="process_bar_foreground"></div>
+            </div>
         </div>
     </div>
 </body>

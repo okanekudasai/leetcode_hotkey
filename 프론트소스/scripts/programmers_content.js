@@ -2,6 +2,8 @@ var run_button_click = () => {
     document.querySelector('#run-code').click();
 }
 
+chrome.runtime.sendMessage({ "need_hot_key": true })
+
 /** 코드와 문제제목과 언어를 파싱해요 
  * @return {object} 파싱한 코드, 문제이름, 언어를 담은 데이터, 시간과 메모리는 항상 0이다.
 */
@@ -28,6 +30,7 @@ let parsing_data = () => {
 init = async () => {
     let submit_code = document.querySelector("#submit-code");
     submit_code.addEventListener("click", async () => {
+
         // 해결 감지가 켜져있는지 확인 해요 꺼져있다면 더이상 진행하지 않아요
         let is_solve_detect_check = await new Promise((resolve, reject) => {
             chrome.storage.local.get("solve_detect", (result) => resolve(result["solve_detect"]))

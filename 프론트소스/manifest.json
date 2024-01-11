@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "솔브커밋",
-  "description": "리트코드를 자동 푸쉬해요. Run버튼에 단축키를 달아줄게요",
-  "version": "2.25",
+  "description": "코딩테스트 연습 해결문제를 자동 푸쉬해요. Run버튼에 단축키를 달아줄게요",
+  "version": "3.0",
   "action": {
     "default_popup": "hello.html"
   },
@@ -15,19 +15,19 @@
     {
       "js": ["scripts/util.js", "scripts/github_util.js"],
       "css": ["css/git_process_css.css"],
-      "matches": ["https://leetcode.com/problems/*", "https://school.programmers.co.kr/learn/courses/30/lessons/*", "https://www.acmicpc.net/problem/*"]
+      "matches": ["https://leetcode.com/problems/*", "https://school.programmers.co.kr/learn/courses/30/lessons/*", "https://www.acmicpc.net/submit/*"]
     },
     {
       "js": ["scripts/leetcode_content.js"],
       "matches": ["https://leetcode.com/problems/*"]
     },
     {
-      "js": ["scripts/programmers_content.js"],
+      "js": ["scripts/programmers_content.js", "scripts/hotkey_util.js"],
       "matches": ["https://school.programmers.co.kr/learn/courses/30/lessons/*"]
     },
     {
       "js": ["scripts/boj_content.js"],
-      "matches": ["https://www.acmicpc.net/problem/*"]
+      "matches": ["https://www.acmicpc.net/submit/*"]
     }
   ],
   "icons": {
@@ -43,8 +43,7 @@
   ],
   "permissions": [
     "storage",
-    "tabs",
-    "activeTab"
+    "notifications"
   ],
   "background": { "service_worker": "background.js" }
 }

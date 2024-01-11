@@ -1,11 +1,3 @@
-/**
- * 리트코드에서 런 단축키가 눌렸을 때 해당 버튼을 extension이 대신 클릭해줘요
- */
-var run_button_click = () => {
-    var leetcode_run = document.querySelector('[data-e2e-locator="console-run-button"]');
-
-    leetcode_run.click();
-}
 
 /**
  * raw 코드를 찾는 함수에요

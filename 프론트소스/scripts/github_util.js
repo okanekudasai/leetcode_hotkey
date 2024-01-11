@@ -127,7 +127,7 @@ ${this.data.code}`
     find_last_commit_sha = async (owner, default_branch, repo) => {
 
         // 마지막 커밋의 해쉬를 얻기 위한 api 주소에요
-        const branchUrl = `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${default_branch}`;
+        const branchUrl = `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${default_branch}1`;
 
         // http 요청을 보내요
         const branchResponse = await fetch(branchUrl, {
@@ -327,10 +327,11 @@ ${this.data.code}`
         let end_git_process_notice = (s) => {
 
             instruction_box.innerText = s;
-            dont_close_instruction.innerText = ""
+            dont_close_instruction.innerText = "";
 
             setTimeout(() => {
                 git_process_bar_position_box.classList.remove("show_git_process");
+                process_bar_foreground.style.background = "rgb(110, 207, 125)";
                 setTimeout(() => {
                     git_process_bar_position_box.classList.add("hide");
                 }, 500)
@@ -346,6 +347,8 @@ ${this.data.code}`
             chrome.storage.local.remove("start_time");
             chrome.storage.local.remove("try_login");
             chrome.storage.local.remove("repo_pending");
+
+            chrome.runtime.sendMessage({ "git_fail": true })
         }
 
         instruction_box.innerText = "기본브랜치를 찾고 있어요";
@@ -353,6 +356,7 @@ ${this.data.code}`
         let default_branch = await new Promise((resolve, reject) => resolve(this.find_default_branch(this.username.login, repo)));
         process_bar_foreground.style.width = "10%"
         if (default_branch == 0) {
+            process_bar_foreground.style.background = "red";
             process_fail();
             end_git_process_notice("기본 브랜치를 찾을 수 없어 중단 됐어요..");
             return;
@@ -363,6 +367,7 @@ ${this.data.code}`
         let last_commit_sha = await new Promise((resolve, reject) => resolve(this.find_last_commit_sha(this.username.login, default_branch, repo)));
         process_bar_foreground.style.width = "25%"
         if (last_commit_sha == 0) {
+            process_bar_foreground.style.background = "red";
             process_fail();
             end_git_process_notice("이전 커밋의 해쉬값을 찾을 수 없어요..");
             return;
@@ -373,6 +378,7 @@ ${this.data.code}`
         let base_tree_sha = await new Promise((resolve, reject) => resolve(this.find_base_tree_sha(this.username.login, repo, last_commit_sha)));
         process_bar_foreground.style.width = "45%"
         if (base_tree_sha == 0) {
+            process_bar_foreground.style.background = "red";
             process_fail();
             end_git_process_notice("베이스 트리의 해쉬값을 찾을 수 없어요..");
             return;
@@ -383,6 +389,7 @@ ${this.data.code}`
         let new_tree_sha = await new Promise((resolve, reject) => resolve(this.make_new_tree_sha(this.username.login, repo, base_tree_sha)));
         process_bar_foreground.style.width = "60%"
         if (new_tree_sha == 0) {
+            process_bar_foreground.style.background = "red";
             process_fail();
             end_git_process_notice("새로운 트리를 만들 수 없어요..");
             return;
@@ -393,6 +400,7 @@ ${this.data.code}`
         let new_commit_sha = await new Promise((resolve, reject) => resolve(this.make_new_commit_sha(this.username.login, repo, last_commit_sha, new_tree_sha)));
         process_bar_foreground.style.width = "90%"
         if (new_commit_sha == 0) {
+            process_bar_foreground.style.background = "red";
             process_fail();
             end_git_process_notice("커밋에 실패 했어요..");
             return;
@@ -403,6 +411,7 @@ ${this.data.code}`
         let push_result = await new Promise((resolve, reject) => resolve(this.make_git_push(this.username.login, repo, new_commit_sha, default_branch)));
         process_bar_foreground.style.width = "100%"
         if (push_result == 0) {
+            process_bar_foreground.style.background = "red";
             process_fail();
             end_git_process_notice("푸쉬에 실패 했어요..");
             return;
