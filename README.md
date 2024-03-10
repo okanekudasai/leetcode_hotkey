@@ -12,7 +12,7 @@
 ## 시작하기
 
 ### 다운로드 링크
-아직 검수중ㅜㅜ
+https://chromewebstore.google.com/detail/%EC%86%94%EB%B8%8C%EC%BB%A4%EB%B0%8B/aknkiaaoecgdkjkplhfhaeafhamjgogf?hl=ko
 
 ### 시연영상
 https://youtu.be/HZpwY9qWm7Q
